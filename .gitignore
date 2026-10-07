@@ -1,1 +1,7 @@
-dotenv_files
+data/
+.env
+dotenv_files/
+*.sqlite3
+__pycache__/
+*.pyc
+venv/
