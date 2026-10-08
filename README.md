@@ -72,13 +72,13 @@ Usuário
 - [x] Criar o app `graphic`
 - [x] Registrar o app em `INSTALLED_APPS`
 - [x] Criar o `requirements.txt`
-- [ ] Criar o `.gitignore` (venv, db.sqlite3, `__pycache__`)
-- [ ] *(depois)* Dockerfile, docker-compose e PostgreSQL
+- [x]  Criar o `.gitignore` (venv, db.sqlite3, `__pycache__`)
+- [x] *(depois)* Dockerfile, docker-compose e PostgreSQL
 
 ### Etapa 1 — Models e admin
-- [ ] Criar os models Board, List, Card e Label
-- [ ] Rodar `makemigrations` e `migrate` sem erro
-- [ ] Registrar os models no admin e criar dados de teste
+- [x] Criar os models Board, List, Card e Label
+- [x] Rodar `makemigrations` e `migrate` sem erro
+- [x] Registrar os models no admin e criar dados de teste
 - [ ] Apagar um quadro apaga as listas e os cartões dele
 
 ### Etapa 2 — Login

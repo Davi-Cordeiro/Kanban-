@@ -1,5 +1,5 @@
 FROM python:3.11.3-alpine3.18
-LABEL mantainer="davicordeiro01012008@gmail.com"
+LABEL maintainer="davicordeiro01012008@gmail.com"
 
 # Essa variável de ambiente é usada para controlar se o Python deve 
 # gravar arquivos de bytecode (.pyc) no disco. 1 = Não, 0 = Sim
@@ -10,16 +10,18 @@ ENV PYTHONDONTWRITEBYTECODE 1
 # Em resumo, você verá os outputs do Python em tempo real.
 ENV PYTHONUNBUFFERED 1
 
-# Copia a pasta "djangoapp" e "scripts" para dentro do container.
+# Copia a pasta "project" (código Django + requirements.txt) para dentro do container.
 COPY project /project
 
-# Entra na pasta djangoapp no container
+# Entra na pasta project no container (onde fica o manage.py)
 WORKDIR /project  
 
 # A porta 8000 estará disponível para conexões externas ao container
 # É a porta que vamos usar para o Django.
 EXPOSE 8000
 
+# Cria o venv, instala as dependências, cria um usuário sem privilégios (duser)
+# e prepara as pastas de arquivos estáticos e de mídia com as permissões dele.
 RUN python -m venv /venv && \
   /venv/bin/pip install --upgrade pip && \
   /venv/bin/pip install -r /project/requirements.txt && \
@@ -32,10 +34,11 @@ RUN python -m venv /venv && \
   chmod -R 755 /data/web/static && \
   chmod -R 755 /data/web/media
 
-# Coloca o venv no PATH
+# Coloca o venv no PATH, assim "python" e "pip" usam o venv sem precisar ativá-lo
 ENV PATH="/venv/bin:$PATH"
 
 # Muda o usuário para duser
 USER duser
 
+# Aplica as migrations e sobe o servidor de desenvolvimento do Django
 CMD ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
