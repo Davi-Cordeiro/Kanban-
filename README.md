@@ -79,7 +79,7 @@ Usuário
 - [x] Criar os models Board, List, Card e Label
 - [x] Rodar `makemigrations` e `migrate` sem erro
 - [x] Registrar os models no admin e criar dados de teste
-- [ ] Apagar um quadro apaga as listas e os cartões dele
+- [X] Apagar um quadro apaga as listas e os cartões dele
 
 ### Etapa 2 — Login
 - [ ] Login e logout

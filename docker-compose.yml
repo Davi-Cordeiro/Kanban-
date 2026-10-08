@@ -1,8 +1,6 @@
-version: '3.9'
-
 services:
   djangoapp:
-    container_name: kanban-psql
+    container_name: kanban-django
     build:
       context: .
     ports:
@@ -16,8 +14,8 @@ services:
     depends_on:
       - psql
   psql:
-    container_name: psql
-    image: postgres:13-alpine
+    container_name: kanban-psql
+    image: postgres:16-alpine
     volumes:
       - ./data/postgres/data:/var/lib/postgresql/data/
     env_file:
