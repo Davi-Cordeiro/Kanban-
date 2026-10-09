@@ -6,6 +6,17 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>Aqui você está dentro do Login</h1>
+    {% extends "base.html" %}
+     
+    {% block content %}
+        <section class="login">
+            <h1 class="register__title">Você já possui uma conta existente?</h1>
+            <form method="post" class="login__form">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-login">Cadastrar</button>
+            </form>
+        </section>
+    {% endblock %}
 </body>
 </html>
