@@ -1,0 +1,14 @@
+{% if user.is_authenticated%}
+    <header>
+        <span class="navbar-brand">Kanban</span>
+        <h1>Bem-vindo, {{ user.username }}</h1>
+        <a class="btn-logout" href="{% url 'logout' %}">Logout</a>
+    </header>
+
+{% else %}
+    <header>
+        <span class="navbar-brand">Kanban</span>
+        <h1>Usuário não cadastrado</h1>
+        <a class="btn-login" href="{% url 'login' %}">Login</a>
+    </header>
+{% endif %}
