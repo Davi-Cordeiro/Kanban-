@@ -1,12 +1,22 @@
-{% load static%}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-</body>
-</html>
+{% block content %}
+    <section class="home">
+        <div class="home__intro">
+            <h1 class="home__title">Seus quadros</h1>
+            <p class="home__subtitle">Organize suas tarefas em listas e cartões.</p>
+        </div>
+
+        {% if user.is_authenticated %}
+            <div class="home__boards">
+                {# Aqui entra a lista de quadros do usuário (BoardInfo) #}
+                <p class="home__empty">Você ainda não tem nenhum quadro.</p>
+            </div>
+        {% else %}
+            <div class="home__guest">
+                <p>Faça login para ver seus quadros.</p>
+                <a class="btn btn-login" href="{% url 'login' %}">Login</a>
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}

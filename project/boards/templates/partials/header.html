@@ -1,14 +1,19 @@
-{% if user.is_authenticated%}
-    <header>
-        <span class="navbar-brand">Kanban</span>
-        <h1>Bem-vindo, {{ user.username }}</h1>
-        <a class="btn-logout" href="{% url 'logout' %}">Logout</a>
-    </header>
+<header class="header">
+    <div class="header__container">
+        <a class="header__brand" href="{% url 'home' %}">Kanban</a>
 
-{% else %}
-    <header>
-        <span class="navbar-brand">Kanban</span>
-        <h1>Usuário não cadastrado</h1>
-        <a class="btn-login" href="{% url 'login' %}">Login</a>
-    </header>
-{% endif %}
+        <nav class="header__nav">
+            {% if user.is_authenticated %}
+                <span class="header__user">Olá, {{ user.username }}</span>
+
+                {# Logout via POST, como o LogoutView do Django exige #}
+                <form class="header__logout" method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-logout">Logout</button>
+                </form>
+            {% else %}
+                <a class="btn btn-login" href="{% url 'login' %}">Login</a>
+            {% endif %}
+        </nav>
+    </div>
+</header>
