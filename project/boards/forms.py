@@ -1,5 +1,18 @@
-from django import form, forms
+from django.shortcuts import render
+from .models import LoginForm, RegisterForm
+def login_view(request):
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            return render(request, 'home.html', {form: form})
+    else:
+        form = LoginForm()
+        return render(request, 'login.html')
 
-class LoginForm(form.Form):
-    username = forms.CharField(max_length=100)
-    password = forms.CharField(widget=forms.PasswordInput)
+def register_view(request):
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            return render(request,'home.html', {form: form})
+        else:
+            return render(request, 'register.html')
