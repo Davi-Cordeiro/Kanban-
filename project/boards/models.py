@@ -45,11 +45,11 @@ class CardInfo(models.Model):
     def __str__(self):
         return self.title
 class LoginForm(forms.Form):
-    email = forms.EmailField("Digite o email do seu usuário")
+    email = forms.EmailField(label="Digite o email do seu usuário")
     password = forms.CharField("Digite a senha do seu usuário", widget=forms.PasswordInput)
 
 class RegisterForm(forms.Form):
     username = forms.CharField("Digite o nome do seu usuário", max_length=150)
-    email = forms.EmailField("Escolha um e-mail para o seu usuário")
+    email = forms.EmailField(label="Escolha um e-mail para o seu usuário")
     password = forms.CharField("Digite a senha do seu usuário", widget=forms.PasswordInput)
     password_confirm = forms.CharField("Confirme a senha do seu usuário", widget=forms.PasswordInput)
