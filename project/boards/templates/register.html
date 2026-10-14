@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    {% extends "base.html" %}
+     
+    {% block content %}
+        <section class="login">
+            <h1 class="register__title">Vamos criar a sua conta!</h1>
+            <form method="post" class="login">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-login">Cadastrar</button>
+            </form>
+        </section>
+    {% endblock %}
+</body>
+</html>
