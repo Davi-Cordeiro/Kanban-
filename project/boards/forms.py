@@ -12,16 +12,18 @@ def login_form_view(request):
             usuario = User.objects.filter(email=email).first()
             password = form.cleaned_data['password']
 
-        user = None
-        if usuario is not None:
-            user = authenticate(request, username=usuario.username, password=password)
+            user = None
+            if usuario is not None:
+                user = authenticate(request, username=usuario.username, password=password)
 
-        if user is not None:
-            login(request, user)
-            return render(request, 'home.html', {'form': form})
-        form.add_error(None, "Usuário ou email inválido")
+            if user is not None:
+                login(request, user)
+                return render(request, 'home.html', {'form': form})
+            form.add_error(None, "Usuário ou email inválido")
+    else:
+        form = LoginForm()
+    return render(request, 'login.html', {'form': form})
 
-        
 def register_form_view(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
@@ -36,9 +38,9 @@ def register_form_view(request):
                 user = User.objects.create_user(username=username, email=email, password=password)
                 login(request, user)
                 return render(request,'home.html', {'form': form})
-
+            
             elif password != password_confirm:
-                form.add_error(password_confirm, "Uma senha diferente da outra!")
+                form.add_error('password_confirm',"Uma senha diferente da outra!")
 
     else:
         form = RegisterForm()
