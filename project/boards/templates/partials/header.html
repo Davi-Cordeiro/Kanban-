@@ -5,7 +5,7 @@
         <nav class="header__nav">
             {% if user.is_authenticated %}
                 <span class="header__user">Olá, {{ user.username }}</span>
-                    <a class="btn btn-logout" href="{% url 'home' %}">Logout</a>
+                    <a class="btn btn-logout" href="{% url 'logout' %}">Logout</a>
             {% else %}
                 <a class="btn btn-login" href="{% url 'login' %}">Login</a>
             {% endif %}
