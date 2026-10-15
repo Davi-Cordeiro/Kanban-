@@ -24,6 +24,8 @@ def login_form_view(request):
         form = LoginForm()
     return render(request, 'login.html', {'form': form})
 
+
+
 def register_form_view(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)

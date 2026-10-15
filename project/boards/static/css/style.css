@@ -76,6 +76,14 @@ main {
   background-color: var(--color-primary-hover);
 }
 
+.btn-register {
+  background-color: var(--color-primary);
+}
+
+.btn-register:hover {
+  background-color: var(--color-primary-hover);
+}
+
 .btn-logout {
   background-color: var(--color-danger);
 }
