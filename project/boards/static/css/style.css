@@ -84,6 +84,14 @@ main {
   background-color: var(--color-primary-hover);
 }
 
+.btn-admin {
+  background-color: rgb(4, 197, 4);
+}
+
+.btn-admin:hover {
+  background-color: green;
+}
+
 .btn-logout {
   background-color: var(--color-danger);
 }
