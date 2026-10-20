@@ -6,9 +6,12 @@
             {% if user.is_authenticated %}
                 <span class="header__user">Olá, {{ user.username }}</span>
                     <a class="btn btn-admin" href="/admin">Admin</a>
-                    <a class="btn btn-logout" href="{% url 'logout' %}">Logout</a>
+                    <form method="post" action="{% url 'sair' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-logout">Logout</button>
+                    </form>
             {% else %}
-                <a class="btn btn-login" href="{% url 'login' %}">Login</a>
+                <a class="btn btn-login" href="{% url 'entrar' %}">Login</a>
             {% endif %}
         </nav>
     </div>

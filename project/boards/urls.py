@@ -5,8 +5,8 @@ from boards.forms import login_form_view, register_form_view, logout_form_view
 
 urlpatterns = [
     path('', home_view, name='home'),
-    path('login/', login_form_view, name='login'),
-    path('register/', register_form_view, name='register'),
-    path('logout/', logout_form_view, name='logout'),
+    path('login/', login_form_view, name='entrar'),
+    path('register/', register_form_view, name='registrar'),
+    path('logout/', logout_form_view, name='sair'),
     path("accounts/", include("django.contrib.auth.urls")),
 ]

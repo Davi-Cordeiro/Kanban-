@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import LoginForm, RegisterForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -19,16 +19,16 @@ def login_form_view(request):
 
             if user is not None:
                 login(request, user)
-                return render(request, 'home.html', {'form': form})
+                return redirect('home')
             form.add_error(None, "Usuário ou email inválido")
     else:
         form = LoginForm()
-    return render(request, 'login.html', {'form': form})
+    return render(request, 'registration/login.html', {'form': form})
 
 
 def logout_form_view(request):
     logout(request)
-    return render(request, 'home.html')
+    return redirect('home')
 
 
 def register_form_view(request):
@@ -44,11 +44,11 @@ def register_form_view(request):
             if password == password_confirm:
                 user = User.objects.create_user(username=username, email=email, password=password)
                 login(request, user)
-                return render(request,'home.html', {'form': form})
+                return redirect('home')
             
             elif password != password_confirm:
                 form.add_error('password_confirm',"Uma senha diferente da outra!")
 
     else:
         form = RegisterForm()
-    return render(request, 'register.html', {'form' : form})
+    return render(request, 'registration/register.html', {'form' : form})
