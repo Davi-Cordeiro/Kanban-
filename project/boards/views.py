@@ -8,3 +8,4 @@ def logout_view(request):
 
 def home_view(request):
     return render(request, 'home.html')
+

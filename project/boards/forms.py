@@ -2,6 +2,7 @@ from django.shortcuts import render
 from .models import LoginForm, RegisterForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.contrib.auth.views import PasswordChangeDoneView, PasswordChangeView, PasswordResetConfirmView, PasswordResetCompleteView
 
 def login_form_view(request):
     if request.method == 'POST':

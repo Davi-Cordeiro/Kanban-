@@ -16,6 +16,8 @@
                 {{ form.as_p }}
                 <button type="submit" class="btn btn-login">Entrar</button>
                 <a class="btn btn-login" href="{% url 'register' %}">Cadastrar uma nova conta</a>
+                <a href="{% url 'password_reset' %}" class="text-sm text-teal-500 hover:underline ml-auto">Esqueceu a senha?</a>
+
             </form>
         </section>
     {% endblock %}
