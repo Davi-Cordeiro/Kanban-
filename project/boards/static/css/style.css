@@ -249,7 +249,13 @@ main {
   font-family: Georgia, 'Times New Roman', Times, serif;
 }
   
-
+#id_password {
+  font-size: large;
+  background-color: #0099ff3d;
+  border: 2px solid rgb(38, 38, 141) ;
+  border-radius: 4px;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+}
 /* =========================================
    RESPONSIVO
    ========================================= */
