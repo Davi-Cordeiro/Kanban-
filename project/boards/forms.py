@@ -1,54 +1,12 @@
-from django.shortcuts import render, redirect
-from .models import LoginForm, RegisterForm
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
-from django.contrib.auth.views import PasswordChangeDoneView, PasswordChangeView, PasswordResetConfirmView, PasswordResetCompleteView
+from django.db import models
+from django import forms
 
-def login_form_view(request):
-    if request.method == 'POST':
-        form = LoginForm(request.POST)
-        
-        if form.is_valid():
-            email = form.cleaned_data['email']
-            usuario = User.objects.filter(email=email).first()
-            password = form.cleaned_data['password']
+class LoginForm(forms.Form):
+    email = forms.EmailField(label="Digite o email do seu usuário")
+    password = forms.CharField(label="Digite a senha do seu usuário", widget=forms.PasswordInput)
 
-            user = None
-            if usuario is not None:
-                user = authenticate(request, username=usuario.username, password=password)
-
-            if user is not None:
-                login(request, user)
-                return redirect('home')
-            form.add_error(None, "Usuário ou email inválido")
-    else:
-        form = LoginForm()
-    return render(request, 'registration/login.html', {'form': form})
-
-
-def logout_form_view(request):
-    logout(request)
-    return redirect('home')
-
-
-def register_form_view(request):
-    if request.method == 'POST':
-        form = RegisterForm(request.POST)
-        
-        if form.is_valid():
-            username = form.cleaned_data['username']
-            email = form.cleaned_data['email']
-            password = form.cleaned_data['password']
-            password_confirm = form.cleaned_data['password_confirm']
-            
-            if password == password_confirm:
-                user = User.objects.create_user(username=username, email=email, password=password)
-                login(request, user)
-                return redirect('home')
-            
-            elif password != password_confirm:
-                form.add_error('password_confirm',"Uma senha diferente da outra!")
-
-    else:
-        form = RegisterForm()
-    return render(request, 'registration/register.html', {'form' : form})
+class RegisterForm(forms.Form):
+    username = forms.CharField(label="Digite o nome do seu usuário", max_length=150)
+    email = forms.EmailField(label="Escolha um e-mail para o seu usuário")
+    password = forms.CharField(label="Digite a senha do seu usuário", widget=forms.PasswordInput)
+    password_confirm = forms.CharField(label="Confirme a senha do seu usuário", widget=forms.PasswordInput)
