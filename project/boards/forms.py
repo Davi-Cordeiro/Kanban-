@@ -1,7 +1,8 @@
 from django.db import models
 from django import forms
 from django.core.exceptions import ValidationError
-from django.core.validators import validate_email
+from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.validators import ASCIIUsernameValidator
 from django.contrib.auth import get_user_model
 
 class LoginForm(forms.Form):
@@ -13,11 +14,11 @@ class LoginForm(forms.Form):
         email = self.cleaned_data["email"]
         email_exist_or_not = user.objects.filter(email__iexact=email).exists()
 
-        if email_exist_or_not == True:
+        if email_exist_or_not:
             return email
 
         else: 
-            raise ValidationError("E-mail não existe dentro da plataforma")
+            raise ValidationError("E-mail ou senha inválido")
 
 
 class RegisterForm(forms.Form):
@@ -27,19 +28,47 @@ class RegisterForm(forms.Form):
     password_confirm = forms.CharField(label="Confirme a senha do seu usuário", widget=forms.PasswordInput)
 
     def clean_username(self):
+        validator = ASCIIUsernameValidator()
         username = self.cleaned_data["username"]
+        user = get_user_model()
+        username_exist = user.objects.filter(username__iexact=username).exists()
 
-        if username.isalpha():
-            return username
+        if validator(username) == None:
+            if username_exist:
+                raise ValidationError("Nome de usuário já existe na plataforma")    
+            else:
+                return username 
         else:
             raise ValidationError("Nome inválido, o nome deve ter somente letras")
 
+    def clean_email(self):
+        email = self.cleaned_data["email"]
+        user = get_user_model()
+        email_exist = user.objects.filter(email__iexact=email).exists()
+
+        if email_exist:
+            raise ValidationError("E-mail já cadastrado dentro da plataforma")
+
+        else:
+            return email
+            
+        
+
     def clean(self):
         cleaned_data = super().clean()
-        password = cleaned_data["password"]
-        confirm = cleaned_data["password_confirm"]
+        password = cleaned_data.get("password")
+        confirm = cleaned_data.get("password_confirm")
 
         if password and confirm and password != confirm:
             self.add_error("password_confirm", "Erro, uma senha é diferente da outra!")
-        else:
-            return cleaned_data
+
+        elif password == None:
+            raise ValidationError("Sua senha está vázia!")
+
+        elif password:
+            try:
+                validate_password(password)
+            except ValidationError as erro:
+                self.add_error("password", erro)
+
+        return cleaned_data
