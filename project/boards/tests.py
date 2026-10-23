@@ -23,5 +23,6 @@ class RegisterFormTest(TestCase):
         user_created = user.objects.create_user(username="testedoemail", email="emailtester@gmail.com", password="usertester@2026")
         
         #Criando usuario para testar email repetido
-        form = RegisterForm({"username":"testedoemail", "email":"emailtester@gmail.com", "password":"usertester@2026", "password_confirm":"usertester@2026"})
-        self.assertIn(form.email, user_created.email)
+        form = RegisterForm({"username":"usuariodoemail", "email":"emailtester@gmail.com", "password":"usertester@2026", "password_confirm":"usertester@2026"})
+        self.assertFalse(form.is_valid())
+        self.assertIn("email", form.errors)
