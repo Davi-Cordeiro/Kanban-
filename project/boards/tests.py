@@ -17,5 +17,11 @@ class RegisterFormTest(TestCase):
         form=RegisterForm({"username":"DaviTeste", "email":"bichomalucotester@gmail.com", "password":"usertester@2026", "password_confirm":"usertester@2026"})
         self.assertFalse(form.is_valid())
 
+    def test_email_duplicated(self):
+        #Criando usuário para deixar salvo no banco
+        user = get_user_model()
+        user_created = user.objects.create_user(username="testedoemail", email="emailtester@gmail.com", password="usertester@2026")
         
-        
+        #Criando usuario para testar email repetido
+        form = RegisterForm({"username":"testedoemail", "email":"emailtester@gmail.com", "password":"usertester@2026", "password_confirm":"usertester@2026"})
+        self.assertIn(form.email, user_created.email)
