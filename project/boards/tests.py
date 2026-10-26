@@ -43,9 +43,9 @@ class RegisterFormTest(TestCase):
     def test_email_diferent_letters(self):
         #Avisa caso o email tenha letra diferentes dos que estão no banco
         user = get_user_model()
-        user_created = user.objects.create_user(username="DaviTeste", email="usernametester@gmail.com", password="usertester@2026")
+        user_created = user.objects.create_user(username="DaviTeste", email="teste@gmail.com", password="usertester@2026")
 
-        form = RegisterForm({"username": "DaviTeste", "email":"teste@gmail.com", "password":"pass@@2025", "password_confirm": "pass@@2025"})
+        form = RegisterForm({"username": "DaviTeste@", "email":"TESTE@gmail.com", "password":"pass@@2025", "password_confirm": "pass@@2025"})
         self.assertIn("email", form.errors)
     def test_password_error(self):
         #Verifica uma senha diferente da outra
@@ -96,5 +96,5 @@ class AuthViewsTest(TestCase):
         response = self.client.post(reverse("entrar"), {"email": "teste@gmail.com", "password": "s@@2025"})
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Usuário ou senha inválido")
+        self.assertContains(response, "Usuário ou email inválido")
         self.assertNotIn("_auth_user_id", self.client.session)
