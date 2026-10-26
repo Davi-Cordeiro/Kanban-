@@ -83,4 +83,18 @@ class AuthViewsTest(TestCase):
     def test_register_view_create_user(self):
         response = self.client.post(reverse("registrar"), {"username": "NovoUser","email": "novo@gmail.com", "password": "pass@@2025", "password_confirm": "pass@@2025" })
 
-        self.assertRedirects(response, reverse("Home"))
+        self.assertRedirects(response, reverse("home"))
+        self.assertTrue(get_user_model().objects.filter(username="NovoUser").exists())
+
+    def test_login_view_correct_password(self):
+        response = self.client.post(reverse("entrar"), {"email": "teste@gmail.com", "password": "pass@@2025"})
+
+        self.assertRedirects(response, reverse("home"))
+        self.assertIn("_auth_user_id", self.client.session)  # usuário está logado
+
+    def test_login_view_wrong(self):
+        response = self.client.post(reverse("entrar"), {"email": "teste@gmail.com", "password": "s@@2025"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Usuário ou senha inválido")
+        self.assertNotIn("_auth_user_id", self.client.session)
