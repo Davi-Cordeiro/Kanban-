@@ -10,6 +10,9 @@ class LoginForm(forms.Form):
     password = forms.CharField(label="Digite a senha do seu usuário", widget=forms.PasswordInput)
 
     def clean_email(self):
+        """
+        Permite a criação caso o email que o usuário digitou esteja no banco 
+        """
         user = get_user_model()
         email = self.cleaned_data["email"]
         email_exist_or_not = user.objects.filter(email__iexact=email).exists()
@@ -28,6 +31,9 @@ class RegisterForm(forms.Form):
     password_confirm = forms.CharField(label="Confirme a senha do seu usuário", widget=forms.PasswordInput)
 
     def clean_username(self):
+        """
+        valida se o usuário já esxiste na plataforma
+        """
         validator = ASCIIUsernameValidator()
         username = self.cleaned_data["username"]
         user = get_user_model()
@@ -42,6 +48,9 @@ class RegisterForm(forms.Form):
             raise ValidationError("Nome inválido, o nome deve ter somente letras")
 
     def clean_email(self):
+        """
+        Vallidação de o e-mail já está cadastrado dentro da plataforma
+        """
         email = self.cleaned_data["email"]
         user = get_user_model()
         email_exist = user.objects.filter(email__iexact=email).exists()
@@ -55,6 +64,9 @@ class RegisterForm(forms.Form):
         
 
     def clean(self):
+        """
+        Validações de senha
+        """
         cleaned_data = super().clean()
         password = cleaned_data.get("password")
         confirm = cleaned_data.get("password_confirm")
