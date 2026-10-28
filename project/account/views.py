@@ -12,10 +12,6 @@ def login_view(request):
 def logout_view(request):
     return render(request, 'logout.html')
 
-@login_required
-def home_view(request):
-    return render(request, 'home.html')
-
 def login_form_view(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
