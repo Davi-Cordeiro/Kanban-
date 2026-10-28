@@ -27,7 +27,7 @@ def login_form_view(request):
 
             if user is not None:
                 login(request, user)
-                return redirect('home')
+                return redirect('kanban:home')
             form.add_error(None, "Usuário ou email inválido")
     else:
         form = LoginForm()
@@ -36,7 +36,7 @@ def login_form_view(request):
 
 def logout_form_view(request):
     logout(request)
-    return redirect('home')
+    return redirect('kanban:home')
 
 
 def register_form_view(request):
@@ -52,7 +52,7 @@ def register_form_view(request):
             if password == password_confirm:
                 user = User.objects.create_user(username=username, email=email, password=password)
                 login(request, user)
-                return redirect('home')
+                return redirect('kanban:home')
             
             elif password != password_confirm:
                 form.add_error('password_confirm',"Uma senha diferente da outra!")

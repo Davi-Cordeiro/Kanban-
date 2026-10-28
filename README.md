@@ -33,20 +33,23 @@ Kanban-project/
 ├── project/
 │   ├── manage.py
 │   ├── requirements.txt
-│   ├── boards/          # usuários: login, cadastro, logout, reset de senha
+│   ├── account/         # usuários: login, cadastro, logout, reset de senha
 │   │   ├── views.py
 │   │   ├── forms.py     # LoginForm, RegisterForm
-│   │   ├── urls.py
+│   │   ├── urls.py      # sem app_name: rotas 'entrar', 'registrar', 'sair'
+│   │   ├── tests.py
 │   │   ├── static/css/style.css
 │   │   └── templates/   # base.html, partials/, registration/
 │   ├── kanban/          # quadros, listas, cartões e etiquetas
-│   │   ├── models.py
+│   │   ├── models.py    # BoardInfo, ListInfo, CardInfo, LabelInfo
 │   │   ├── admin.py
 │   │   ├── views.py
 │   │   ├── forms.py     # BoardForm, ListForm, CardForm
-│   │   ├── urls.py      # app_name = 'kanban'
+│   │   ├── urls.py      # app_name = 'kanban': rotas 'kanban:home', 'kanban:board'...
+│   │   ├── tests.py
 │   │   └── templates/kanban/   # home.html, board.html, board_form.html
 │   └── project/         # settings, urls, wsgi, asgi
+│                        # urls: '' → account, 'kanban/' → kanban
 └── venv/                # ambiente virtual (não versionar)
 ```
 
@@ -150,9 +153,9 @@ Usuário
 
 ### Etapa 0 — Ambiente
 - [x] Criar o projeto Django e o ambiente virtual
-- [x] Criar o app `boards`
-- [ ] Criar o app `kanban` (ver Etapa 2.5)
-- [x] Registrar o app em `INSTALLED_APPS`
+- [x] Criar o app de usuários (`boards`, depois renomeado para `account`)
+- [x] Criar o app `kanban` (ver Etapa 2.5)
+- [x] Registrar os apps em `INSTALLED_APPS`
 - [x] Criar o `requirements.txt`
 - [x]  Criar o `.gitignore` (venv, db.sqlite3, `__pycache__`)
 - [x] *(depois)* Dockerfile, docker-compose e PostgreSQL
@@ -169,123 +172,61 @@ Usuário
 - [x] Páginas protegidas redirecionam para o login (`@login_required` + `LOGIN_URL = 'entrar'`)
 - [ ] Teste: abrir a `home` sem login redireciona para `entrar`
 
-### Etapa 2.5 — Separar o app `kanban` ⬅️ **próximo passo**
-- [ ] Criar o app `kanban` e registrar em `INSTALLED_APPS`
-- [ ] Mover models, admin e forms do Kanban de `boards` para `kanban`
-- [ ] Recriar as migrations no app novo (SQLite **e** Postgres)
-- [ ] Mover a `home` para o `kanban`, com namespace (`kanban:home`)
-- [ ] `python manage.py check` e testes passando
+### Etapa 2.5 — Separar os apps `account` e `kanban`
+- [x] Renomear o app `boards` para `account` (só autenticação)
+- [x] Criar o app `kanban` e registrar em `INSTALLED_APPS`
+- [x] Mover models e admin do Kanban para o `kanban`
+- [x] Recriar as migrations no app novo (`kanban/migrations/0001_initial.py`)
+- [x] Mover a `home` para o `kanban`, com namespace (`kanban:home`)
+- [x] `python manage.py check` e testes passando
+- [ ] Decidir a raiz `/`: hoje dá 404 (a home está em `/kanban/`). Opções: trocar
+      `path('kanban/', ...)` por `path('', include('kanban.urls'))` no `project/urls.py`,
+      ou fazer `/` redirecionar para `kanban:home`
+- [ ] Limpeza: apagar `login_view` e `logout_view` do `account` (não são usadas)
 
 <details>
-<summary><b>Como fazer a Etapa 2.5 (passo a passo)</b></summary>
+<summary><b>O que foi feito e o que aprendi</b></summary>
 
-**Por quê:** hoje o app `boards` cuida dos **usuários** (login, cadastro,
-logout, senha), mas os models do Kanban também estão nele. Separando:
-- `boards` → só autenticação
-- `kanban` → quadros, listas, cartões, etiquetas e as páginas deles
+**Divisão dos apps**
+- `account` → login, cadastro, logout, reset de senha. Guarda também o
+  `base.html`, os `partials/` e o `style.css`, que são usados pelo site todo
+  (o `{% extends "base.html" %}` acha o arquivo em qualquer app).
+- `kanban` → quadros, listas, cartões, etiquetas e as páginas deles.
 
-> ⚠️ **A ordem dos passos importa.** Os models já têm migration no `boards`
-> (`boards/migrations/0001_initial.py`) e as tabelas no banco se chamam
-> `boards_boardinfo` etc. Se só mover o código, o Django acha que o `boards`
-> apagou os models e o `kanban` criou outros, e as migrations entram em conflito.
-> Como estamos em desenvolvimento, o caminho mais simples é: **desfazer → mover → recriar**.
-> Os dados de teste do Kanban (quadros, listas, cartões) serão apagados;
-> os **usuários não** (ficam no app `auth`).
+**Migrations ao mover models entre apps**
+O nome da tabela depende do app (`boards_boardinfo` → `kanban_boardinfo`).
+Como estamos em desenvolvimento, o caminho foi **desfazer → mover → recriar**:
+1. `migrate boards zero` com os models **ainda** no app antigo (apaga as tabelas;
+   os usuários ficam, porque são do app `auth`);
+2. mover o código e apagar a migration antiga;
+3. `makemigrations kanban` e `migrate`.
 
-**1. Desfazer as migrations do `boards` (com os models AINDA no `boards`)**
-```bash
-# Docker / Postgres
-sudo docker compose exec djangoapp python manage.py migrate boards zero
+O banco do Kanban foi zerado: criar dados de teste de novo pelo admin.
 
-# SQLite local (se você usa)
-cd project && ../venv/bin/python manage.py migrate boards zero
-```
-Rodar nos **dois** bancos, senão o que ficar para trás dá erro depois.
+**Namespace de URLs**
+- O prefixo `app:` vem do `app_name` do `urls.py` **onde a rota está definida**.
+- `kanban/urls.py` tem `app_name = 'kanban'` → `kanban:home`, `kanban:board`...
+- `account/urls.py` não tem → `entrar`, `registrar`, `sair` (sem prefixo).
+- O `manage.py check` **não** pega nome de rota errado em `redirect`, `{% url %}`
+  e `reverse`: só os testes (ou abrir a página) mostram o `NoReverseMatch`.
+  Para achar todos os usos: `grep -rn "'home'\|\"home\"" project/`
 
-**2. Criar o app**
-```bash
-sudo docker compose exec djangoapp python manage.py startapp kanban
-sudo chown -R $USER project/kanban   # o Docker cria os arquivos como root
-```
-Adicionar `'kanban'` no `INSTALLED_APPS` do `settings.py`.
+**Templates com namespace**
+Os templates do kanban ficam em `kanban/templates/kanban/` e a view usa
+`render(request, 'kanban/home.html')`. A pasta com o nome do app evita que um
+`home.html` de um app esconda o de outro.
 
-**3. Mover o código**
-| De | Para |
-| --- | --- |
-| os 4 models de `boards/models.py` | `kanban/models.py` |
-| os `@admin.register` de `boards/admin.py` | `kanban/admin.py` (import: `from .models import ...`) |
-| `BoardForm` (se já criou) | `kanban/forms.py` |
-| `home_view` (e `board_create_view`) | `kanban/views.py` |
-| `boards/templates/home.html` | `kanban/templates/kanban/home.html` |
-
-- O `boards/models.py` e o `boards/admin.py` podem ficar vazios (só com os imports padrão).
-- `login_view` e `logout_view` não são usadas no `urls.py`: dá para apagar.
-- O `base.html` e os `partials/` **ficam** no `boards`: o `{% extends "base.html" %}`
-  acha o arquivo em qualquer app.
-- Por que `templates/kanban/` (com o nome do app repetido)? Para dois apps poderem
-  ter um `home.html` sem um esconder o outro. Na view:
-  `render(request, 'kanban/home.html', ...)`.
-
-**4. Apagar a migration antiga**
-Apagar `boards/migrations/0001_initial.py`. **Manter** o `boards/migrations/__init__.py`.
-
-**5. Criar e aplicar as migrations novas**
-```bash
-sudo docker compose exec djangoapp python manage.py makemigrations kanban
-sudo docker compose exec djangoapp python manage.py makemigrations   # não deve criar nada para o boards
-sudo docker compose exec djangoapp python manage.py migrate
-```
-(e o `migrate` também no SQLite, se usar)
-
-**6. URLs com namespace**
-
-`kanban/urls.py` (arquivo novo):
-```python
-from django.urls import path
-from . import views
-
-app_name = 'kanban'
-
-urlpatterns = [
-    path('', views.home_view, name='home'),
-    path('boards/novo/', views.board_create_view, name='criar_board'),
-]
-```
-
-`project/urls.py`:
-```python
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('kanban.urls')),
-    path('', include('boards.urls')),
-]
-```
-E **tirar** o `path('', home_view, name='home')` do `boards/urls.py` (e o `home_view` do import).
-
-**7. Trocar `'home'` por `'kanban:home'`**
-Com o `app_name`, o nome da rota passa a ser `kanban:home`. Lugares que usam `home` hoje:
-- `boards/views.py` → os 3 `redirect('home')` (login, logout e cadastro)
-- `boards/templates/partials/header.html` → `{% url 'home' %}`
-- `boards/tests.py` → os 2 `reverse("home")`
-
-Dica para achar todos: `grep -rn "'home'\|\"home\"" project/`
-
-**8. Conferir**
+**Rotina antes de commitar**
 ```bash
 sudo docker compose exec djangoapp python manage.py check
 sudo docker compose exec djangoapp python manage.py test
+git add -A   # o -A faz o git reconhecer arquivos renomeados/movidos
 ```
-- Abrir o site: login → cai na home do Kanban.
-- Abrir o `/admin`: os models aparecem agora na seção **Kanban**.
-- Criar de novo alguns quadros/listas/cartões de teste pelo admin.
-- Fazer o commit.
-
-**Testes:** os de login/cadastro continuam em `boards/tests.py`. Os de quadros
-(criar, listar, um usuário não ver o quadro do outro) vão em `kanban/tests.py`.
 
 </details>
 
-### Etapa 3 — Ver os quadros
+### Etapa 3 — Ver os quadros ⬅️ **próximo passo**
+- [ ] Ordenação por `position` em listas e cartões
 - [ ] Página "meus quadros"
 - [ ] Página do quadro, com as listas lado a lado
 - [ ] Usuário não consegue abrir o quadro de outra pessoa (404)
@@ -294,11 +235,14 @@ sudo docker compose exec djangoapp python manage.py test
 <details>
 <summary><b>Como fazer a Etapa 3 (passo a passo)</b></summary>
 
-> Dica: crie alguns quadros, listas e cartões pelo **admin** para ter dados
-> de teste antes de ter os formulários.
+> Dica: o banco do Kanban foi zerado na Etapa 2.5. Crie alguns quadros, listas
+> e cartões pelo **admin** para ter dados de teste antes de ter os formulários.
 
-> Tudo desta etapa fica no app **`kanban`** (Etapa 2.5). Nomes de rota com
-> namespace: `kanban:home`, `kanban:board`...
+> Tudo desta etapa fica no app **`kanban`**. Nomes de rota com namespace:
+> `kanban:home`, `kanban:board`...
+
+> ⚠️ Só use `{% url 'kanban:algo' %}` num template **depois** que a rota existir
+> no `kanban/urls.py`. Antes disso a página dá erro 500 (`NoReverseMatch`).
 
 **1. Ordenação nos models**
 Em `ListInfo` e `CardInfo`, adicionar:
@@ -326,16 +270,19 @@ def home_view(request):
   `{% if user.is_authenticated %} / {% else %}` deixa de ser necessário.
 - O `.distinct()` evita quadro duplicado quando o usuário é dono e membro ao mesmo tempo.
 
-No `kanban/home.html`, trocar o comentário por um `for` com `empty`:
-```django
-<a class="btn" href="{% url 'kanban:criar_board' %}">+ Novo quadro</a>
+- Imports em `kanban/views.py`: `from .models import BoardInfo`.
 
+No `kanban/home.html`, trocar o comentário por um `for` com `empty`. Por enquanto
+**só o título**, sem link (a rota `kanban:board` ainda não existe):
+```django
 {% for board in boards %}
-    <a class="board-card" href="{% url 'kanban:board' board.pk %}">{{ board.title }}</a>
+    <div class="board-card">{{ board.title }}</div>
 {% empty %}
     <p class="home__empty">Você ainda não tem nenhum quadro.</p>
 {% endfor %}
 ```
+Teste em `kanban/tests.py`: o usuário A vê os quadros dele e **não** vê os do
+usuário B (`response.context['boards']`).
 
 **3. Página do quadro**
 - `kanban/urls.py`: `path('board/<int:pk>/', views.board_view, name='board')`
@@ -344,6 +291,10 @@ No `kanban/home.html`, trocar o comentário por um `for` com `empty`:
   - buscar com `get_object_or_404`, **já filtrando pelo usuário** (mesmo `Q` do passo 2),
     assim trocar o número na URL dá 404 em vez de mostrar o quadro de outra pessoa;
   - renderizar `kanban/board.html` com `{'board': board}`.
+- Agora que a rota existe, transformar o título na home em link:
+  `<a class="board-card" href="{% url 'kanban:board' board.pk %}">{{ board.title }}</a>`
+- O `painel.html` vazio que já existe em `kanban/templates/kanban/` pode virar o
+  `board.html` (é só renomear).
 - `kanban/board.html` (estende `base.html`): dois `for` aninhados:
   ```django
   <h1>{{ board.title }}</h1>
@@ -413,6 +364,9 @@ Para conferir: instalar o `django-debug-toolbar` ou contar as queries com
   ultimo = board.lists.aggregate(Max('position'))['position__max']
   obj.position = (ultimo or 0) + 1
   ```
+- **Criar quadro:** rota `path('boards/novo/', views.board_create_view, name='criar_board')`
+  e, depois dela existir, o botão na home:
+  `<a class="btn" href="{% url 'kanban:criar_board' %}">+ Novo quadro</a>`
 - **Excluir:** GET mostra uma página "Tem certeza?", POST apaga. Nunca apagar no GET.
 - **Mensagens:** `from django.contrib import messages` →
   `messages.success(request, 'Quadro criado!')`, e exibir no `base.html` com
