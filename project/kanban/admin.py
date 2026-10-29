@@ -1,23 +1,23 @@
 from django.contrib import admin
-from kanban.models import BoardInfo, LabelInfo, ListInfo, CardInfo
+from kanban.forms import BoardForm, LabelForm, ListForm, CardForm
 
-@admin.register(BoardInfo)
+@admin.register(BoardForm)
 class BoardInfoAdmin(admin.ModelAdmin):
     list_display = ('title', 'owner', 'created_at',)
     search_fields = ('title', 'owner__username',)
 
-@admin.register(LabelInfo)
+@admin.register(LabelForm)
 class LabelInfoAdmin(admin.ModelAdmin):
     list_display = ('name', 'color', 'board')
     search_fields = ('name', 'board__title',)
 
-@admin.register(ListInfo)
+@admin.register(ListForm)
 class ListInfoAdmin(admin.ModelAdmin):
     list_display = ('title', 'position', 'board')
     search_fields = ('title', 'board__title',)
     ordering = ('board', 'position',)
 
-@admin.register(CardInfo)
+@admin.register(CardForm)
 class CardInfoAdmin(admin.ModelAdmin):
     list_display = ('title', 'list', 'assignee', 'deadline')
     search_fields = ('title', 'list__title', 'assignee__username', 'labels__name',)
