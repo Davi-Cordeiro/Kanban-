@@ -58,7 +58,7 @@ main {
   display: inline-block;
   padding: 8px 18px;
   border: none;
-  border-radius: var(--radius);
+  border-radius: 4px;
   font-family: inherit;
   font-size: 14px;
   font-weight: bold;

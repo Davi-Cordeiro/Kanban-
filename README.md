@@ -179,10 +179,10 @@ Usuário
 - [x] Recriar as migrations no app novo (`kanban/migrations/0001_initial.py`)
 - [x] Mover a `home` para o `kanban`, com namespace (`kanban:home`)
 - [x] `python manage.py check` e testes passando
-- [ ] Decidir a raiz `/`: hoje dá 404 (a home está em `/kanban/`). Opções: trocar
+- [x] Decidir a raiz `/`: hoje dá 404 (a home está em `/kanban/`). Opções: trocar
       `path('kanban/', ...)` por `path('', include('kanban.urls'))` no `project/urls.py`,
       ou fazer `/` redirecionar para `kanban:home`
-- [ ] Limpeza: apagar `login_view` e `logout_view` do `account` (não são usadas)
+- [x] Limpeza: apagar `login_view` e `logout_view` do `account` (não são usadas)
 
 <details>
 <summary><b>O que foi feito e o que aprendi</b></summary>

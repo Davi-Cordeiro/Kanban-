@@ -4,14 +4,6 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 
-@login_required
-def login_view(request):
-    return render(request, 'login.html')
-
-@login_required
-def logout_view(request):
-    return render(request, 'logout.html')
-
 def login_form_view(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
