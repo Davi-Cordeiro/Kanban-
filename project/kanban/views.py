@@ -6,8 +6,8 @@ from .models import BoardInfo
 
 @login_required
 def home_view(request):
-    board = BoardInfo.objects.filter(members=request.user)
-    return render(request, 'kanban/home.html', {'board': board})
+    boards = BoardInfo.objects.filter(members=request.user)
+    return render(request, 'kanban/home.html', {'boards': boards})
 
 @login_required
 def create_board_view(request):
