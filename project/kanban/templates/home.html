@@ -13,7 +13,7 @@
                 <div class="home__boards">
                     {% for board in boards %}
                         <div class="home__board">
-                            <h2><a href="{% url 'kanban:board_detail' board.pk %}">{{ board.title }}</a></h2>
+                            <h2><a href="{% url 'kanban:board_detail' board.pk %}" class="title_board">{{ board.title }}</a></h2>
                         </div>
                     {% endfor %}
 
