@@ -6,6 +6,6 @@ app_name = 'kanban'
 
 urlpatterns = [
     path('', home_view, name='home'),
-    path('board/new', create_board_view, name="criacao_de_painel"),
-    path('list/new', create_list_view, name="criacao_de_painel")
+    path('board/new/', create_board_view, name="criacao_de_painel"),
+    path('board/<int:board_id>/list/new', create_list_view, name="criacao_de_list")
 ]

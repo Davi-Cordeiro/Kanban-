@@ -311,3 +311,24 @@ main {
     width: 100%;
   }
 }
+
+/* ==========================================
+                  QUADROS
+========================================== */
+
+.create_board {
+    justify-content: center; 
+    color: var(--color-bg);
+    display: table;
+    margin-inline: auto;
+    padding: 10px 40px;
+    border-radius: 5px;
+    background-color: var(--color-primary);
+    font-family: inherit;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+.create_board:hover {
+  background-color: var(--color-primary-hover);
+}
