@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1 class="home__title">visualizando os detalhes</h1>
+    <p class="home__subtitle"> Escolha um nome para o seu painel</p>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-create_board">Criar quadro</button>
+    </form>
+{% endblock content %}

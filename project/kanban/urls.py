@@ -1,11 +1,12 @@
 
 from django.urls import include, path
-from kanban.views import home_view, create_list_view, create_board_view
+from kanban.views import home_view, create_list_view, create_board_view, board_detail_view
 
 app_name = 'kanban'
 
 urlpatterns = [
     path('', home_view, name='home'),
     path('board/new/', create_board_view, name="criacao_de_painel"),
+    path('board/<int:board_id>/', board_detail_view, name="board_detail"),
     path('board/<int:board_id>/list/new', create_list_view, name="criacao_de_list")
 ]
