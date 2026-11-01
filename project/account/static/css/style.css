@@ -344,3 +344,14 @@ main {
 .title_board {
   text-decoration: none;
 }
+
+.board_list {
+  padding: 32px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.board_intro {
+  margin-bottom: 32px;
+}

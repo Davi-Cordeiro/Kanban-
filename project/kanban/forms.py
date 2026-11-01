@@ -15,8 +15,15 @@ class ListForm(forms.ModelForm):
     class Meta:
         model = ListInfo
         fields = ['title']
+        labels = {'title': 'Nome da etapa',}
 
 class CardForm(forms.ModelForm):
     class Meta:
         model = CardInfo
         fields = ['title', 'description', 'deadline', 'assignee']
+
+    def __init__(self, *args, board=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if board:
+            self.fields['labels'].queryset = board.labels.all()
+            

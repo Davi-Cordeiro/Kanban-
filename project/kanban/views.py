@@ -43,7 +43,10 @@ def create_list_view(request, board_id):
 
     return render(request, 'kanban/creation_list.html', {'form': form})          
 
+
+@login_required
 def board_detail_view(request, board_id):
     board = get_object_or_404(BoardInfo, pk=board_id)
-    lista = board.lists.order_by('position').prefetch_related('cards','card__labels')
-    return render(request, "kanban/board_detail.html", {'board': board, 'listas': lista} )
+    listas = board.lists.order_by('position').prefetch_related('cards','cards__labels')
+    
+    return render(request, "kanban/board_detail.html", {'board': board, 'listas': listas} )

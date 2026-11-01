@@ -1,12 +1,22 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1 class="home__title">visualizando os detalhes</h1>
-    <p class="home__subtitle"> Escolha um nome para o seu painel</p>
+    <div class="board_intro">
+        <h1 class="home__title">visualizando os detalhes do seu quadro</h1>
+        <p class="home__subtitle">Caso não tenha nenhuma etapa, vamos cria-las</p>
+    </div>
 
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-create_board">Criar quadro</button>
-    </form>
+    {% if listas %}
+        <div class="board_list">
+            {% for lista in listas%}
+                <h2> teste principal {{lista.title}}</h2>
+            {% endfor %}
+        </div>    
+
+    {% else %}
+        <div class="board_list">
+            <a href="{% url 'kanban:criacao_de_list' board.pk %}">Criar etapa</a>
+        </div>
+
+    {% endif %}
 {% endblock content %}
