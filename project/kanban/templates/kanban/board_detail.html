@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load static %}
+
 {% block content %}
     <div class="board_intro">
         <h1 class="home__title">visualizando os detalhes do seu quadro</h1>
@@ -24,7 +26,7 @@
         <div class="board_list">
             {% for lista in listas%}
                 <section class="list__item" data-id="{{ lista.pk }}">
-                    <h2>{{lista.title}}</h2>
+                    <h2 class="list__title">{{lista.title}}</h2>
                     <div>
                         {% for card in lista.cards.all %}
                         <article class="card__item">
@@ -45,5 +47,6 @@
 
     {% endif %}
 
-    script src="{% static 'js/board.js' %}"></script>
+    <script src="{% static 'js/board.js' %}"></script>
+
 {% endblock content %}
