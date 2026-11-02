@@ -52,7 +52,15 @@ lists.forEach(list => {
         const listId = list.dataset.id;
 
         if (editMode === 'edit') {
-            console.log('Editar etapa:', listId);
+            const title = list.querySelector('.list__title');
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = title.textContent.trim();
+
+            title.replaceWith(input);
+
+            input.focus();
         }
 
         if (editMode === 'delete') {
