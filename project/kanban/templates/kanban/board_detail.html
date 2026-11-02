@@ -6,10 +6,24 @@
         <p class="home__subtitle">Caso não tenha nenhuma etapa, vamos cria-las</p>
     </div>
 
+    <div class="list__management">
+        <button id="edit-mode" type="button">
+            Editar etapas
+        </button>
+
+        <button id="delete-mode" type="button">
+            Excluir etapas
+        </button>
+
+        <button id="cancel-mode" type="button" hidden>
+            Cancelar
+        </button>
+    </div>
+
     {% if listas %}
         <div class="board_list">
             {% for lista in listas%}
-                <section class="list__item">
+                <section class="list__item" data-id="{{ lista.pk }}">
                     <h2>{{lista.title}}</h2>
                     <div>
                         {% for card in lista.cards.all %}
@@ -30,4 +44,6 @@
         </div>
 
     {% endif %}
+
+    script src="{% static 'js/board.js' %}"></script>
 {% endblock content %}
