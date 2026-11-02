@@ -116,27 +116,30 @@ lists.forEach(list => {
         }
 
         if (editMode === 'delete') {
-            console.log('Excluir etapa:', listId);
-            const titulo = list.querySelector('.list__title')
-            const card = list.querySelector('.card__item')
-            const aviso = card
-            ? 'Excluir esta etapa também excluirá todos os cartões contidos nela. Tem certeza que deseja continuar? '
-            : 'Tem certeza que deseja excluir esta etapa?';
+            const temCards = list.querySelector('.card__item');
+            const aviso = temCards
+                ? 'Excluir esta etapa também excluirá todos os cartões dela. Tem certeza que deseja continuar?'
+                : 'Tem certeza que deseja excluir esta etapa?';
 
-            if (confirm(aviso)) return;
+            if (!confirm(aviso)) return;
 
             fetch(window.location.href, {
                 method: 'POST',
-                 headers: {
+                headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': csrftoken,
-                }, 
+                    'X-CSRFToken': csrfToken,
+                },
                 body: JSON.stringify({
                     action: 'delete_list',
                     list_id: listId,
-                    new_title: newTitle,
-                })    
-
+                }),
+            })
+                .then(async (response) => {
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.error);
+                    list.remove();
+                })
+                .catch((error) => alert(error.message));
+        }
     });
-
 });
