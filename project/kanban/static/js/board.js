@@ -2,7 +2,7 @@ const editButton = document.querySelector('#edit-mode');
 const deleteButton = document.querySelector('#delete-mode');
 const cancelButton = document.querySelector('#cancel-mode');
 
-const lists = document.querySelectorAll('list__item')
+const lists = document.querySelectorAll('.list__item')
 
 let editMode = null;
 
@@ -52,20 +52,90 @@ lists.forEach(list => {
         const listId = list.dataset.id;
 
         if (editMode === 'edit') {
-            const title = list.querySelector('.list__title');
+            if (editMode === 'edit') {
+                const title = list.querySelector('.list__title');
 
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.value = title.textContent.trim();
+                if (!title) return;
 
-            title.replaceWith(input);
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = title.textContent.trim();
 
-            input.focus();
+                const saveButton = document.createElement('button');
+                saveButton.textContent = 'Salvar';
+                saveButton.type = 'button';
+
+                title.replaceWith(input);
+
+                list.appendChild(saveButton);
+
+                input.focus();
+
+                saveButton.addEventListener('click', async (event) => {
+                    event.stopPropagation();
+
+                    const newTitle = input.value.trim();
+
+                    if (!newTitle) {
+                        alert('O título não pode ficar vazio.');
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch(window.location.href, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': csrftoken,
+                            },
+                            body: JSON.stringify({
+                                action: 'edit_list',
+                                list_id: listId,
+                                new_title: newTitle,
+                            })
+                        });
+
+                        const data = await response.json();
+
+                        if (!response.ok) {
+                            throw new Error(data.error);
+                        }
+
+                        const newHeading = document.createElement('h2');
+                        newHeading.className = 'list__title';
+                        newHeading.textContent = data.title;
+
+                        input.replaceWith(newHeading);
+                        saveButton.remove();
+
+                    } catch (error) {
+                        alert(error.message);
+                    }
+                });
+            }
         }
 
         if (editMode === 'delete') {
             console.log('Excluir etapa:', listId);
-        }
+            const titulo = list.querySelector('.list__title')
+            const card = list.querySelector('.card__item')
+            const aviso = card
+            ? 'Excluir esta etapa também excluirá todos os cartões contidos nela. Tem certeza que deseja continuar? '
+            : 'Tem certeza que deseja excluir esta etapa?';
+
+            if (confirm(aviso)) return;
+
+            fetch(window.location.href, {
+                method: 'POST',
+                 headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken,
+                }, 
+                body: JSON.stringify({
+                    action: 'delete_list',
+                    list_id: listId,
+                    new_title: newTitle,
+                })    
 
     });
 
