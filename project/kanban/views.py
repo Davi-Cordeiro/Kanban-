@@ -36,7 +36,7 @@ def create_list_view(request, board_id):
             lista.board = board
             lista.position = board.lists.count()
             lista.save()
-            return redirect('kanban:home')
+            return redirect('kanban:board_detail', board_id=board.id)
 
     else:
         form = ListForm()

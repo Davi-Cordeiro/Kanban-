@@ -104,6 +104,41 @@ main {
   background-color: var(--color-primary);
 }
 
+.btn-create_list {
+  background-color: var(--color-primary);
+}
+
+.btn-create_list:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.list__item {
+  position: relative;  
+  border: 2px solid black;        /* referência do botão */
+}
+.btn-add-list {
+  position: absolute;
+  top: 50%;
+  right: 0;                         /* encostado na borda da etapa */
+  transform: translate(100%, -50%); /* empurra o botão todo para fora, à direita */
+  width: 1.6rem;                    /* metade da altura */
+  height: 3.2rem;
+  display: grid;
+  place-items: center;
+  border-radius: 0 3.2rem 3.2rem 0; /* arredonda só os cantos da direita */
+  background: #c7ccd6;
+  color: #dad4d4;
+  text-decoration: none;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .15s;
+  color: black
+}
+
+.list__item:hover .btn-add-list {
+  opacity: 1;
+  pointer-events: auto;
+}
 .btn-create_board:hover {
   background-color:var(--color-primary-hover);
 }
@@ -350,8 +385,20 @@ main {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
 }
+
 
 .board_intro {
   margin-bottom: 32px;
 }
+
+.list__item {
+  background-color: #dfd3d3;
+  border-radius: 5px;
+  padding: 10px;
+}
+

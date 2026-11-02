@@ -9,13 +9,24 @@
     {% if listas %}
         <div class="board_list">
             {% for lista in listas%}
-                <h2> teste principal {{lista.title}}</h2>
+                <section class="list__item">
+                    <h2>{{lista.title}}</h2>
+                    <div>
+                        {% for card in lista.cards.all %}
+                        <article class="card__item">
+                            <h3>{{ card.title }}</h3>
+                            <p>{{ card.description }}</p>
+                        </article>
+                        {% endfor %}
+                    </div>
+                    <a class="btn-add-list" href="{% url 'kanban:criacao_de_list' board.pk %}"title="Nova etapa">+</a>
+                </section>
             {% endfor %}
         </div>    
 
     {% else %}
         <div class="board_list">
-            <a href="{% url 'kanban:criacao_de_list' board.pk %}">Criar etapa</a>
+            <a href="{% url 'kanban:criacao_de_list' board.pk %}" class="btn btn-create_list">Criar etapa</a>
         </div>
 
     {% endif %}
