@@ -7,14 +7,30 @@
             <p class="home__subtitle">Organize suas tarefas em listas e cartões.</p>
         </div>
 
+        <div class="board_management">
+            <button id="edit-mode" type="button">
+                Editar quadros
+            </button>
+
+            <button id="delete-mode" type="button">
+                Excluir quadros
+            </button>
+
+            <button id="cancel-mode" type="button">
+                Cancelar
+            </button>
+        </div>
+
         {% if user.is_authenticated %}
 
             {% if boards %}
                 <div class="home__boards">
                     {% for board in boards %}
-                        <div class="home__board">
-                            <h2><a href="{% url 'kanban:board_detail' board.pk %}" class="title_board">{{ board.title }}</a></h2>
-                        </div>
+                        <section class="home__items" data-id="{{board.pk}}">
+                            <div class="board__item">
+                                <h2><a href="{% url 'kanban:board_detail' board.pk %}" class="title__board">{{ board.title }}</a></h2>
+                            </div>
+                        </section>
                     {% endfor %}
 
                     <a href="{% url 'kanban:criacao_de_painel' %}" class="create_board">Criar Quadro</a>
@@ -34,4 +50,6 @@
             </div>
         {% endif %}
     </section>
+    <script>const csrfToken = "{{ csrf_token }}";</script>
+    <script src="{% static 'js/board.js' %}"></script>
 {% endblock %}

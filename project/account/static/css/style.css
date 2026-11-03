@@ -239,6 +239,17 @@ main {
   margin: 0 0 16px;
 }
 
+.home__items {
+  padding: 32px;
+  margin-bottom: 15px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.board_management {
+  margin-bottom: 15px;
+}
 /* =========================================
    FOOTER
    ========================================= */
@@ -400,5 +411,9 @@ main {
   background-color: #dfd3d3;
   border-radius: 5px;
   padding: 10px;
+  margin: 15px;
 }
 
+.list__management {
+  margin-bottom:15px;
+}
