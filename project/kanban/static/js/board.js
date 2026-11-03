@@ -86,7 +86,7 @@ lists.forEach(list => {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'X-CSRFToken': csrftoken,
+                                'X-CSRFToken': csrfToken,
                             },
                             body: JSON.stringify({
                                 action: 'edit_list',

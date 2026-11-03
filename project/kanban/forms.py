@@ -25,5 +25,5 @@ class CardForm(forms.ModelForm):
     def __init__(self, *args, board=None, **kwargs):
         super().__init__(*args, **kwargs)
         if board:
-            self.fields['labels'].queryset = board.labels.all()
+            self.fields['assignee'].queryset = board.members.all()
             

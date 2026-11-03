@@ -56,26 +56,25 @@ def board_detail_view(request, board_id):
 
             dados = json.loads(request.body)
 
-            action = dados.get('action')
             list_id = dados.get('list_id')
 
             if dados.get('action') == 'edit_list':
                 new_title = dados.get('new_title')
 
-                if new_title.isalpha():
-                    lista = get_object_or_404(ListInfo, pk=list_id)
-                    lista.title = new_title
+                if new_title is None:
+                    return JsonResponse({'error': 'Título não encontrado.'}, status=404)
+            
+                elif new_title:
+                    lista = get_object_or_404(ListInfo, pk=list_id, request=request.user)
+                    lista.title = new_title.strip()
                     lista.save(update_fields=['title'])
-                    return JsonResponse({'message': 'Lista atualizada com sucesso.'}, {'title': lista.title})
+                    return JsonResponse({'message': 'Lista atualizada com sucesso.', 'title': lista.title})
 
                 elif new_title == '':
-                    return JsonResponse({'error': 'O título da lista não pode estar vazio.'})
-
-                elif new_title is None:
-                    return JsonResponse({'error': 'Título não encontrado.'}, status=404)
+                    return JsonResponse({'error': 'O título da lista não pode estar vazio.'}, status=400)
 
                 else: 
-                    return JsonResponse({'error': 'O título da lista deve conter apenas letras.'})
+                    return JsonResponse({'error': 'O título da lista deve conter apenas letras.'}, status=400)
                                     
             elif dados.get('action') == 'delete_list':
                 lista = get_object_or_404(ListInfo, pk=list_id)
