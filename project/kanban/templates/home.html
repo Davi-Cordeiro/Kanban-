@@ -18,7 +18,7 @@
                 Excluir quadros
             </button>
 
-            <button id="cancel-mode" type="button">
+            <button id="cancel-mode" type="button" hidden>
                 Cancelar
             </button>
         </div>
@@ -28,8 +28,8 @@
             {% if boards %}
                 <div class="home__boards">
                     {% for board in boards %}
-                        <section class="home__items" data-id="{{board.pk}}">
-                            <div class="board__item">
+                        <section class="home__items">
+                            <div class="board__item" data-id="{{board.pk}}">
                                 <h2><a href="{% url 'kanban:board_detail' board.pk %}" class="title__board">{{ board.title }}</a></h2>
                             </div>
                         </section>

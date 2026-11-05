@@ -51,7 +51,9 @@ boards.forEach(board => {
         if (editMode === 'edit') {
             const title = board.querySelector('.title__board')
 
-            if (!title) return;
+            if (title == null) return;
+
+            const linkUrlTitle = title.getAttribute('href');
             event.preventDefault();
 
 
@@ -70,12 +72,12 @@ boards.forEach(board => {
             input.focus();
 
             saveButton.addEventListener('click', async (event) => {
-                const newTitle = input.value
+                const newTitle = input.value.trim();
 
                 event.preventDefault();
 
                 if (!newTitle) {
-                    alert('O título não pod estar vazio.');
+                    alert('O título não pode estar vazio.');
                     return;
                 }
 
@@ -99,11 +101,15 @@ boards.forEach(board => {
                         throw new Error(data.error)
                     }
 
-                    const newTitleElement = document.createElement('h2');
+                    const newTitleElement = document.createElement('a');
                     newTitleElement.classList.add('title__board');
                     newTitleElement.textContent = data.title;
+                    newTitleElement.setAttribute('href', linkUrlTitle);
 
                     input.replaceWith(newTitleElement);
+
+                    cancelEditMode();
+
                     saveButton.remove();
                 } catch (error) {
                     alert(error.message);
@@ -112,10 +118,9 @@ boards.forEach(board => {
     }
     
     if (editMode === 'delete') {
-        const existBoard = document.querySelector('.board__item');
-        const aviso = existBoard 
-            ? 'Tem quadros nesta lista. Tem certeza que deseja excluir?'
-            : 'Tem certeza que deseja excluir este quadro?';
+        const aviso = 'Excluir este quadro apagará todas as etapas e cartões dele. Continuar?';
+
+        event.preventDefault()
 
         if (!confirm(aviso)) {
             return;
@@ -124,7 +129,7 @@ boards.forEach(board => {
         fetch(window.location.href, {
             method: 'POST',
             headers: {
-                'Contentt-Type': 'application/json',
+                'Content-Type': 'application/json',
                 'X-CSRFToken': csrfToken,
                 },
             body: JSON.stringify({
@@ -135,7 +140,8 @@ boards.forEach(board => {
             .then(async (response) => {
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.error);
-                board.remove();
+                board.closest('.home__items').remove();
+                cancelEditMode();
             })
             .catch (error => { alert(error.message) })
         }

@@ -65,7 +65,7 @@ def board_detail_view(request, board_id):
                     return JsonResponse({'error': 'Título não encontrado.'}, status=404)
             
                 elif new_title:
-                    lista = get_object_or_404(ListInfo, pk=list_id, request=request.user)
+                    lista = get_object_or_404(ListInfo, pk=list_id, board__members=request.user)
                     lista.title = new_title.strip()
                     lista.save(update_fields=['title'])
                     return JsonResponse({'message': 'Lista atualizada com sucesso.', 'title': lista.title})
