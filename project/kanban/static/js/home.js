@@ -43,29 +43,101 @@ cancelButton.addEventListener('click', () => {
 })
 
 boards.forEach(board => {
-    if (!editMode) return;
+    board.addEventListener('click', (event) => { 
+        if (!editMode) return;
 
-    const boardId = board.dataset.id;
+        const boardId = board.dataset.id;
 
-    if (editMode === 'edit') {
-        const title = board.querySelector('.title__board')
+        if (editMode === 'edit') {
+            const title = board.querySelector('.title__board')
 
-        if (!title) return;
+            if (!title) return;
+            event.preventDefault();
 
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.value = title.textContent.trim();
 
-        const saveButton = document.createElement('button');
-        saveButton.textContent = 'Salvar';
-        saveButton.type = 'button';
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = title.textContent.trim();
 
-        title.replaceWith(input);
+            const saveButton = document.createElement('button');
+            saveButton.textContent = 'Salvar';
+            saveButton.type = 'button';
 
-        board.appendChild(saveButton);
+            title.replaceWith(input);
 
-        input.focus();
+            board.appendChild(saveButton);
 
-        
+            input.focus();
+
+            saveButton.addEventListener('click', async (event) => {
+                const newTitle = input.value
+
+                event.preventDefault();
+
+                if (!newTitle) {
+                    alert('O título não pod estar vazio.');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(window.location.href, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrfToken,
+                        },
+                        body: JSON.stringify({
+                            action: 'edit_board',
+                            board_id: boardId,
+                            new_title: newTitle
+                        })
+                    })
+
+                    const data = await response.json();
+
+                    if (!response.ok){
+                        throw new Error(data.error)
+                    }
+
+                    const newTitleElement = document.createElement('h2');
+                    newTitleElement.classList.add('title__board');
+                    newTitleElement.textContent = data.title;
+
+                    input.replaceWith(newTitleElement);
+                    saveButton.remove();
+                } catch (error) {
+                    alert(error.message);
+                }
+            });
     }
+    
+    if (editMode === 'delete') {
+        const existBoard = document.querySelector('.board__item');
+        const aviso = existBoard 
+            ? 'Tem quadros nesta lista. Tem certeza que deseja excluir?'
+            : 'Tem certeza que deseja excluir este quadro?';
+
+        if (!confirm(aviso)) {
+            return;
+        };
+
+        fetch(window.location.href, {
+            method: 'POST',
+            headers: {
+                'Contentt-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+                },
+            body: JSON.stringify({
+                action: 'delete_board',
+                board_id: boardId
+            })
+        })
+            .then(async (response) => {
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error);
+                board.remove();
+            })
+            .catch (error => { alert(error.message) })
+        }
+    });
 })

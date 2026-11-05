@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load static %}
+
 {% block content %}
     <section class="home">
         <div class="home__intro">
@@ -51,5 +53,5 @@
         {% endif %}
     </section>
     <script>const csrfToken = "{{ csrf_token }}";</script>
-    <script src="{% static 'js/board.js' %}"></script>
+    <script src="{% static 'js/home.js' %}"></script>
 {% endblock %}
