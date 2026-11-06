@@ -25,7 +25,7 @@ def delete_board(request, dados):
     return JsonResponse({'ok': True})
 
 
-ACTIONS = {
+ACTIONS_BOARD = {
     'edit_board': edit_board,
     'delete_board': delete_board,
 }
@@ -39,7 +39,7 @@ def home_view(request):
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Requisição inválida.'}, status=400)
 
-        handler = ACTIONS.get(dados.get('action'))
+        handler = ACTIONS_BOARD.get(dados.get('action'))
         if handler is None:
             return JsonResponse({'error': 'Ação desconhecida.'}, status=400)
 
@@ -66,7 +66,7 @@ def create_board_view(request):
 
 @login_required
 def create_list_view(request, board_id):
-    board = get_object_or_404(BoardInfo, pk=board_id)
+    board = get_object_or_404(BoardInfo, pk=board_id, members=request.user)
 
     if request.method == 'POST':
         form = ListForm(request.POST)
@@ -83,47 +83,51 @@ def create_list_view(request, board_id):
     return render(request, 'kanban/creation_list.html', {'form': form})          
 
 
+def edit_list_view(request, dados, list_id):
+
+    if 1 < len(dados.get('new_title')) < 101 :
+        lista = get_object_or_404(ListInfo, pk=list_id, board__members=request.user)
+        new_title = dados.get('new_title')
+        lista.title = new_title.strip()
+        lista.save(update_fields=['title'])
+        return JsonResponse({'message': 'Lista atualizada com sucesso', 'title': lista.title})
+
+    else:
+        return JsonResponse({'error': 'O Título tem que ser menor que 100 caractere e maior que 1 caractere'})
+
+
+def delete_list_view(request, dados, list_id):
+
+    lista = get_object_or_404(ListInfo, pk=list_id, board__members=request.user)
+    lista.delete()
+    return JsonResponse({'message': 'Etapa removida com sucesso'})
+
+ACTIONS_LIST = {
+    'edit_list': edit_list_view,
+    'delete_list': delete_list_view
+}
+
+    
 @login_required
 def board_detail_view(request, board_id):
 
-    try:
-
-        if request.method == 'POST':
-
+    if request.method == 'POST':
+        try:
             dados = json.loads(request.body)
-
             list_id = dados.get('list_id')
-
-            if dados.get('action') == 'edit_list':
-                new_title = dados.get('new_title')
-
-                if new_title is None:
-                    return JsonResponse({'error': 'Título não encontrado.'}, status=404)
-            
-                elif new_title:
-                    lista = get_object_or_404(ListInfo, pk=list_id, board__members=request.user)
-                    lista.title = new_title.strip()
-                    lista.save(update_fields=['title'])
-                    return JsonResponse({'message': 'Lista atualizada com sucesso.', 'title': lista.title})
-
-                elif new_title == '':
-                    return JsonResponse({'error': 'O título da lista não pode estar vazio.'}, status=400)
-
-                else: 
-                    return JsonResponse({'error': 'O título da lista deve conter apenas letras.'}, status=400)
-                                    
-            elif dados.get('action') == 'delete_list':
-                lista = get_object_or_404(ListInfo, pk=list_id)
-                lista.delete()
-                return JsonResponse({'message': 'Lista deletada com sucesso.'})
-
-    
-            
-
-        board = get_object_or_404(BoardInfo, pk=board_id)
-        listas = board.lists.order_by('position').prefetch_related('cards','cards__labels')
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Requisição inválida.'}, status=400)
         
-        return render(request, "kanban/board_detail.html", {'board': board, 'listas': listas} )
+        handler = ACTIONS_LIST.get(dados.get('action'))
+
+        if handler is None:
+            return JsonResponse({'error': 'Requisição com dados inexistentes'}, status=400)
+
+        return handler(request, dados, list_id)
+        
+
+    board = get_object_or_404(BoardInfo, pk=board_id)
+    listas = board.lists.order_by('position').prefetch_related('cards','cards__labels')
     
-    except json.JSONDecodeError:
-        return JsonResponse({'error': 'Requisição inválida.'}, status=400)
+    return render(request, "kanban/board_detail.html", {'board': board, 'listas': listas} )
+        
