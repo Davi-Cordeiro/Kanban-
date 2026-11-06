@@ -7,8 +7,44 @@ from django.http import JsonResponse
 from .forms import CardForm, ListForm, BoardForm
 from .models import BoardInfo, ListInfo
 
+
+def edit_board(request, dados):
+    title = (dados.get('new_title') or '').strip()
+    if not title or len(title) > 100:
+        return JsonResponse({'error': 'O título deve ter entre 1 e 100 caracteres.'}, status=400)
+
+    board = get_object_or_404(BoardInfo, pk=dados.get('board_id'), owner=request.user)
+    board.title = title
+    board.save(update_fields=['title'])
+    return JsonResponse({'title': board.title})
+
+
+def delete_board(request, dados):
+    board = get_object_or_404(BoardInfo, pk=dados.get('board_id'), owner=request.user)
+    board.delete()
+    return JsonResponse({'ok': True})
+
+
+ACTIONS = {
+    'edit_board': edit_board,
+    'delete_board': delete_board,
+}
+
+
 @login_required
 def home_view(request):
+    if request.method == 'POST':
+        try:
+            dados = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Requisição inválida.'}, status=400)
+
+        handler = ACTIONS.get(dados.get('action'))
+        if handler is None:
+            return JsonResponse({'error': 'Ação desconhecida.'}, status=400)
+
+        return handler(request, dados)
+
     boards = BoardInfo.objects.filter(members=request.user)
     return render(request, 'home.html', {'boards': boards})
 
