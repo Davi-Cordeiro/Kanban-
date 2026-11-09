@@ -8,21 +8,20 @@
         <p class="home__subtitle">Caso não tenha nenhuma etapa, vamos cria-las</p>
     </div>
 
-    <div class="list__management">
-        <button id="edit-mode" type="button">
-            Editar etapas
-        </button>
-
-        <button id="delete-mode" type="button">
-            Excluir etapas
-        </button>
-
-        <button id="cancel-mode" type="button" hidden>
-            Cancelar
-        </button>
-    </div>
-
     {% if listas %}
+        <div class="list__management">
+            <button id="edit-mode" type="button">
+                Editar etapas
+            </button>
+
+            <button id="delete-mode" type="button">
+                Excluir etapas
+            </button>
+
+            <button id="cancel-mode" type="button" hidden>
+                Cancelar
+            </button>
+        </div>
         <div class="board_list">
             {% for lista in listas%}
                 <section class="list__item" data-id="{{ lista.pk }}">
@@ -35,7 +34,9 @@
                         </article>
                         {% endfor %}
                     </div>
-                    <a class="btn-add-list" href="{% url 'kanban:criacao_de_list' board.pk %}"title="Nova etapa">+</a>
+                    {% if forloop.last %}
+                        <a class="btn-add-list" href="{% url 'kanban:criacao_de_list' board.pk %}" title="Nova etapa">+</a>
+                    {% endif %}
                 </section>
             {% endfor %}
         </div>    

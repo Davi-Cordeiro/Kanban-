@@ -51,70 +51,72 @@ lists.forEach(list => {
 
         const listId = list.dataset.id;
 
+    
         if (editMode === 'edit') {
-            if (editMode === 'edit') {
-                const title = list.querySelector('.list__title');
+            const title = list.querySelector('.list__title');
 
-                if (!title) return;
+            if (!title) return;
 
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.value = title.textContent.trim();
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = title.textContent.trim();
 
-                const saveButton = document.createElement('button');
-                saveButton.textContent = 'Salvar';
-                saveButton.type = 'button';
+            const saveButton = document.createElement('button');
+            saveButton.textContent = 'Salvar';
+            saveButton.type = 'button';
 
-                title.replaceWith(input);
+            title.replaceWith(input);
 
-                list.appendChild(saveButton);
+            list.appendChild(saveButton);
 
-                input.focus();
+            input.focus();
 
-                saveButton.addEventListener('click', async (event) => {
-                    event.stopPropagation();
+            saveButton.addEventListener('click', async (event) => {
+                event.stopPropagation();
 
-                    const newTitle = input.value.trim();
+                const newTitle = input.value.trim();
 
-                    if (!newTitle) {
-                        alert('O título não pode ficar vazio.');
-                        return;
+                if (!newTitle) {
+                    alert('O título não pode ficar vazio.');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(window.location.href, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrfToken,
+                        },
+                        body: JSON.stringify({
+                            action: 'edit_list',
+                            list_id: listId,
+                            new_title: newTitle,
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.error);
+                        location.reload()
                     }
 
-                    try {
-                        const response = await fetch(window.location.href, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRFToken': csrfToken,
-                            },
-                            body: JSON.stringify({
-                                action: 'edit_list',
-                                list_id: listId,
-                                new_title: newTitle,
-                            })
-                        });
+                    const newHeading = document.createElement('h2');
+                    newHeading.className = 'list__title';
+                    newHeading.textContent = data.title;
 
-                        const data = await response.json();
+                    input.replaceWith(newHeading);
 
-                        if (!response.ok) {
-                            throw new Error(data.error);
-                        }
+                    cancelEditMode()
+                    saveButton.remove();
 
-                        const newHeading = document.createElement('h2');
-                        newHeading.className = 'list__title';
-                        newHeading.textContent = data.title;
-
-                        input.replaceWith(newHeading);
-                        saveButton.remove();
-
-                    } catch (error) {
-                        alert(error.message);
-                    }
-                });
-            }
+                } catch (error) {
+                    alert(error.message);
+                }
+            });
         }
-
+        
         if (editMode === 'delete') {
             const temCards = list.querySelector('.card__item');
             const aviso = temCards
@@ -138,7 +140,9 @@ lists.forEach(list => {
                     const data = await response.json();
                     if (!response.ok) throw new Error(data.error);
                     list.remove();
+                    location.reload()
                 })
+                
                 .catch((error) => alert(error.message));
         }
     });

@@ -99,6 +99,7 @@ boards.forEach(board => {
 
                     if (!response.ok){
                         throw new Error(data.error)
+                        
                     }
 
                     const newTitleElement = document.createElement('a');
@@ -113,6 +114,7 @@ boards.forEach(board => {
                     saveButton.remove();
                 } catch (error) {
                     alert(error.message);
+                    location.reload();
                 }
             });
     }
@@ -142,6 +144,7 @@ boards.forEach(board => {
                 if (!response.ok) throw new Error(data.error);
                 board.closest('.home__items').remove();
                 cancelEditMode();
+                location.reload();
             })
             .catch (error => { alert(error.message) })
         }

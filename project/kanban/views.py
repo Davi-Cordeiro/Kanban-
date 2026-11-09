@@ -9,11 +9,15 @@ from .models import BoardInfo, ListInfo
 
 
 def edit_board(request, dados):
+    board = BoardInfo.objects.filter(pk=dados.get('board_id'), owner=request.user).firts()
+
+    if board is None:
+        return JsonResponse({'error': 'Quadro não encontrado ou sem permissão.'}, status=404)
+
     title = (dados.get('new_title') or '').strip()
     if not title or len(title) > 100:
         return JsonResponse({'error': 'O título deve ter entre 1 e 100 caracteres.'}, status=400)
 
-    board = get_object_or_404(BoardInfo, pk=dados.get('board_id'), owner=request.user)
     board.title = title
     board.save(update_fields=['title'])
     return JsonResponse({'title': board.title})
@@ -84,13 +88,14 @@ def create_list_view(request, board_id):
 
 
 def edit_list_view(request, dados, list_id):
+    title = dados.get('new_title')
 
-    if 1 < len(dados.get('new_title')) < 101 :
+    if not title or len(title) > 100:
         lista = get_object_or_404(ListInfo, pk=list_id, board__members=request.user)
         new_title = dados.get('new_title')
         lista.title = new_title.strip()
         lista.save(update_fields=['title'])
-        return JsonResponse({'message': 'Lista atualizada com sucesso', 'title': lista.title})
+        return JsonResponse({'message': 'Lista atualizada com sucesso', 'title': lista.title}, status=401)
 
     else:
         return JsonResponse({'error': 'O Título tem que ser menor que 100 caractere e maior que 1 caractere'})
@@ -98,7 +103,7 @@ def edit_list_view(request, dados, list_id):
 
 def delete_list_view(request, dados, list_id):
 
-    lista = get_object_or_404(ListInfo, pk=list_id, board__members=request.user)
+    lista = get_object_or_404(ListInfo, pk=list_id, members=request.user)
     lista.delete()
     return JsonResponse({'message': 'Etapa removida com sucesso'})
 
@@ -110,6 +115,7 @@ ACTIONS_LIST = {
     
 @login_required
 def board_detail_view(request, board_id):
+    board = get_object_or_404(BoardInfo, pk=board_id, members=request.user)
 
     if request.method == 'POST':
         try:
@@ -126,7 +132,7 @@ def board_detail_view(request, board_id):
         return handler(request, dados, list_id)
         
 
-    board = get_object_or_404(BoardInfo, pk=board_id)
+    board = get_object_or_404(BoardInfo, pk=board_id, members=request.user)
     listas = board.lists.order_by('position').prefetch_related('cards','cards__labels')
     
     return render(request, "kanban/board_detail.html", {'board': board, 'listas': listas} )

@@ -9,23 +9,22 @@
             <p class="home__subtitle">Organize suas tarefas em listas e cartões.</p>
         </div>
 
-        <div class="board_management">
-            <button id="edit-mode" type="button">
-                Editar quadros
-            </button>
-
-            <button id="delete-mode" type="button">
-                Excluir quadros
-            </button>
-
-            <button id="cancel-mode" type="button" hidden>
-                Cancelar
-            </button>
-        </div>
-
         {% if user.is_authenticated %}
 
             {% if boards %}
+                <div class="board_management">
+                    <button id="edit-mode" type="button">
+                        Editar quadros
+                    </button>
+
+                    <button id="delete-mode" type="button">
+                        Excluir quadros
+                    </button>
+
+                    <button id="cancel-mode" type="button" hidden>
+                        Cancelar
+                    </button>
+                </div>
                 <div class="home__boards">
                     {% for board in boards %}
                         <section class="home__items">
