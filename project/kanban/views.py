@@ -101,9 +101,8 @@ def edit_list_view(request, dados, list_id):
     return JsonResponse({'message': 'Lista atualizada com sucesso', 'title': lista.title}, status=200)
 
 
-def delete_list_view(request, dados, list_id):
-
-    lista = get_object_or_404(ListInfo, pk=list_id)
+def delete_list_view(request, dados, list_id, board):
+    lista = board.lists.filter(pk=dados.get('list_id')).first()
     lista.delete()
     return JsonResponse({'message': 'Etapa removida com sucesso'})
 
@@ -115,8 +114,6 @@ ACTIONS_LIST = {
     
 @login_required
 def board_detail_view(request, board_id):
-    board = get_object_or_404(BoardInfo, pk=board_id, members=request.user)
-
     if request.method == 'POST':
         try:
             dados = json.loads(request.body)
@@ -129,11 +126,9 @@ def board_detail_view(request, board_id):
         if handler is None:
             return JsonResponse({'error': 'Requisição com dados inexistentes'}, status=400)
 
-        return handler(request, dados, list_id)
-        
+        return handler(request, dados, list_id, board)
 
     board = get_object_or_404(BoardInfo, pk=board_id, members=request.user)
     listas = board.lists.order_by('position').prefetch_related('cards','cards__labels')
-    
     return render(request, "kanban/board_detail.html", {'board': board, 'listas': listas} )
         

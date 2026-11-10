@@ -99,7 +99,6 @@ lists.forEach(list => {
 
                     if (!response.ok) {
                         throw new Error(data.error);
-                        location.reload()
                     }
 
                     const newHeading = document.createElement('h2');
@@ -113,6 +112,7 @@ lists.forEach(list => {
 
                 } catch (error) {
                     alert(error.message);
+                    location.reload()
                 }
             });
         }
