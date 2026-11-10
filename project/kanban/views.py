@@ -9,7 +9,7 @@ from .models import BoardInfo, ListInfo
 
 
 def edit_board(request, dados):
-    board = BoardInfo.objects.filter(pk=dados.get('board_id'), owner=request.user).firts()
+    board = BoardInfo.objects.filter(pk=dados.get('board_id'), owner=request.user).first()
 
     if board is None:
         return JsonResponse({'error': 'Quadro não encontrado ou sem permissão.'}, status=404)
@@ -89,21 +89,21 @@ def create_list_view(request, board_id):
 
 def edit_list_view(request, dados, list_id):
     title = dados.get('new_title')
-
+    if title is None:
+        return JsonResponse({'error': 'Título vazio, escreva novamente'})
     if not title or len(title) > 100:
-        lista = get_object_or_404(ListInfo, pk=list_id, board__members=request.user)
-        new_title = dados.get('new_title')
-        lista.title = new_title.strip()
-        lista.save(update_fields=['title'])
-        return JsonResponse({'message': 'Lista atualizada com sucesso', 'title': lista.title}, status=401)
-
-    else:
         return JsonResponse({'error': 'O Título tem que ser menor que 100 caractere e maior que 1 caractere'})
+
+    lista = get_object_or_404(ListInfo, pk=list_id, board__members=request.user)
+    new_title = dados.get('new_title')
+    lista.title = new_title.strip()
+    lista.save(update_fields=['title'])
+    return JsonResponse({'message': 'Lista atualizada com sucesso', 'title': lista.title}, status=200)
 
 
 def delete_list_view(request, dados, list_id):
 
-    lista = get_object_or_404(ListInfo, pk=list_id, members=request.user)
+    lista = get_object_or_404(ListInfo, pk=list_id)
     lista.delete()
     return JsonResponse({'message': 'Etapa removida com sucesso'})
 
