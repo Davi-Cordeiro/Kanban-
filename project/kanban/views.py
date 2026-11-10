@@ -94,7 +94,7 @@ def edit_list_view(request, dados, list_id):
     if not title or len(title) > 100:
         return JsonResponse({'error': 'O Título tem que ser menor que 100 caractere e maior que 1 caractere'})
 
-    lista = get_object_or_404(ListInfo, pk=list_id, board__members=request.user)
+    lista = get_object_or_404(ListInfo, pk=list_id, members=request.user)
     new_title = dados.get('new_title')
     lista.title = new_title.strip()
     lista.save(update_fields=['title'])
@@ -131,4 +131,23 @@ def board_detail_view(request, board_id):
     board = get_object_or_404(BoardInfo, pk=board_id, members=request.user)
     listas = board.lists.order_by('position').prefetch_related('cards','cards__labels')
     return render(request, "kanban/board_detail.html", {'board': board, 'listas': listas} )
-        
+
+@login_required
+def create_card_view(request, board_id):
+    lista = get_object_or_404(ListInfo, pk=board_id, members=request.user )
+
+    if lista is None:
+        return JsonResponse({'erro': 'Quadro nao existe'})
+
+    elif request.method is 'POST':
+        form = CardForm(request.POST)
+        if form.is_valid():
+            card = form.save(commit=False)
+            card.lista = lista 
+            card.position = card.lista.count()
+            return redirect('kanban:board_detail', lista_id=lista.id)
+
+    else:
+        form = ListForm()
+
+    return render(request, 'kanban/creation_card.html', {'form': form})      

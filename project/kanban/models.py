@@ -6,6 +6,9 @@ class BoardInfo(models.Model):
     members = models.ManyToManyField('auth.User', related_name='boards')
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta: 
+        ordering = ['created_at']
+
     def __str__(self):
         return self.title
 
@@ -22,6 +25,9 @@ class ListInfo(models.Model):
     position = models.PositiveIntegerField()
     board = models.ForeignKey(BoardInfo, on_delete=models.CASCADE, related_name='lists')
 
+    class Meta:
+        ordering = ['position']
+
     def __str__(self):
         return self.title
 
@@ -32,7 +38,11 @@ class CardInfo(models.Model):
     position = models.PositiveIntegerField()
     list = models.ForeignKey(ListInfo, on_delete=models.CASCADE, related_name='cards')
     labels = models.ManyToManyField(LabelInfo, related_name='cards', blank=True)
-    assignee = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, related_name='assigned_cards')
+    assignee = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True , blank=True, related_name='assigned_cards')
+    created_at = models.DateField(auto_now_add=True)
+    
+    class Meta: 
+        ordering = ['created_at']
 
     def __str__(self):
         return self.title
