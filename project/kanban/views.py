@@ -87,14 +87,14 @@ def create_list_view(request, board_id):
     return render(request, 'kanban/creation_list.html', {'form': form})          
 
 
-def edit_list_view(request, dados, list_id):
+def edit_list_view(request, dados, list_id, board):
     title = dados.get('new_title')
     if title is None:
-        return JsonResponse({'error': 'Título vazio, escreva novamente'})
+        return JsonResponse({'error': 'Título vazio, escreva novamente'}, status=400)
     if not title or len(title) > 100:
-        return JsonResponse({'error': 'O Título tem que ser menor que 100 caractere e maior que 1 caractere'})
+        return JsonResponse({'error': 'O Título tem que ser menor que 100 caractere e maior que 1 caractere'}, status=400)
 
-    lista = get_object_or_404(ListInfo, pk=list_id, members=request.user)
+    lista = get_object_or_404(ListInfo, pk=list_id, board__members=request.user)
     new_title = dados.get('new_title')
     lista.title = new_title.strip()
     lista.save(update_fields=['title'])
@@ -103,6 +103,10 @@ def edit_list_view(request, dados, list_id):
 
 def delete_list_view(request, dados, list_id, board):
     lista = board.lists.filter(pk=dados.get('list_id')).first()
+
+    if lista is None:
+        return JsonResponse({'erro': 'Lista inexistente'}, status=400)
+
     lista.delete()
     return JsonResponse({'message': 'Etapa removida com sucesso'})
 
@@ -114,6 +118,8 @@ ACTIONS_LIST = {
     
 @login_required
 def board_detail_view(request, board_id):
+    board = get_object_or_404(BoardInfo, pk=board_id, members=request.user)
+
     if request.method == 'POST':
         try:
             dados = json.loads(request.body)
@@ -128,26 +134,26 @@ def board_detail_view(request, board_id):
 
         return handler(request, dados, list_id, board)
 
-    board = get_object_or_404(BoardInfo, pk=board_id, members=request.user)
     listas = board.lists.order_by('position').prefetch_related('cards','cards__labels')
     return render(request, "kanban/board_detail.html", {'board': board, 'listas': listas} )
 
 @login_required
-def create_card_view(request, board_id):
-    lista = get_object_or_404(ListInfo, pk=board_id, members=request.user )
+def create_card_view(request, board_id, list_id):
+    lista = get_object_or_404(ListInfo, pk=list_id, board__members=request.user)
 
     if lista is None:
         return JsonResponse({'erro': 'Quadro nao existe'})
 
-    elif request.method is 'POST':
+    elif request.method =='POST':
         form = CardForm(request.POST)
         if form.is_valid():
             card = form.save(commit=False)
-            card.lista = lista 
-            card.position = card.lista.count()
+            card.list = lista 
+            card.position = card.list.count()
+            card.save()
             return redirect('kanban:board_detail', lista_id=lista.id)
 
     else:
-        form = ListForm()
+        form = CardForm()
 
     return render(request, 'kanban/creation_card.html', {'form': form})      
