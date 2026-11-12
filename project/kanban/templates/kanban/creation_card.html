@@ -2,5 +2,6 @@
 
 {% block content %}
     {% csrf_token %}
-    {{% form.as_p%}}
+    {{% form.as_p %}}
+    <button type="submit" class="btn btn-create_board">Criar Card</button>
 {% endblock content%}
