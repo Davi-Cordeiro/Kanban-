@@ -5,8 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from .forms import CardForm, ListForm, BoardForm
-from .models import BoardInfo, ListInfo
-
+from .models import BoardInfo, ListInfo, CardInfo
+from django.db.models import Max
 
 def edit_board(request, dados):
     board = BoardInfo.objects.filter(pk=dados.get('board_id'), owner=request.user).first()
@@ -138,22 +138,20 @@ def board_detail_view(request, board_id):
     return render(request, "kanban/board_detail.html", {'board': board, 'listas': listas} )
 
 @login_required
-def create_card_view(request, board_id, list_id):
-    lista = get_object_or_404(ListInfo, pk=list_id, board__members=request.user)
+def create_card_view(request,board_id, list_id):
+    lista = get_object_or_404(ListInfo, pk=list_id, board__members=request.user, board_id=board_id)
 
-    if lista is None:
-        return JsonResponse({'erro': 'Quadro nao existe'})
-
-    elif request.method =='POST':
-        form = CardForm(request.POST)
+    if request.method =='POST':
+        form = CardForm(request.POST, board=lista.board)
         if form.is_valid():
             card = form.save(commit=False)
-            card.list = lista 
-            card.position = card.list.count()
+            card.list = lista
+            ultimo_card =  lista.cards.aggregate(Max('position', default=-1))['position__max']
+            card.position = ultimo_card + 1
             card.save()
-            return redirect('kanban:board_detail', lista_id=lista.id)
+            return redirect('kanban:creation_card', lista_id=lista.id)
 
     else:
-        form = CardForm()
+        form = CardForm(lista_id=lista.id)
 
     return render(request, 'kanban/creation_card.html', {'form': form})      
