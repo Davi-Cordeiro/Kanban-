@@ -21,6 +21,8 @@
             <button id="cancel-mode" type="button" hidden>
                 Cancelar
             </button>
+
+            <a href="{% url 'kanban:criacao_de_card' board.pk %}" class="btn-create-card">Criar Card</a>
         </div>
         <div class="board_list">
             {% for lista in listas%}

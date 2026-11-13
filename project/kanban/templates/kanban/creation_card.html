@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    {% csrf_token %}
-    {{% form.as_p %}}
-    <button type="submit" class="btn btn-create_board">Criar Card</button>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-create_board">Criar card</button>
+    </form>
 {% endblock content%}
