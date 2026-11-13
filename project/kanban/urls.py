@@ -9,5 +9,5 @@ urlpatterns = [
     path('board/new/', create_board_view, name="criacao_de_painel"),
     path('board/<int:board_id>/', board_detail_view, name="board_detail"),
     path('board/<int:board_id>/list/new/', create_list_view, name="criacao_de_list"),
-    path('board/<int:board_id>/list/card/new/', create_card_view, name = "criacao_de_card")
+    path('board/<int:board_id>/card/new/', create_card_view, name = "criacao_de_card")
 ]

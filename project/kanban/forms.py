@@ -20,10 +20,10 @@ class ListForm(forms.ModelForm):
 class CardForm(forms.ModelForm):
     class Meta:
         model = CardInfo
-        fields = ['title', 'description', 'deadline', 'assignee']
+        fields = ['title', 'description', 'list', 'assignee']
 
     def __init__(self, *args, board=None, **kwargs):
         super().__init__(*args, **kwargs)
         if board:
             self.fields['assignee'].queryset = board.members.all()
-            
+            self.fields['list'].queryset = board.lists.all()
