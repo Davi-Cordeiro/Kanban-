@@ -152,17 +152,49 @@ const cardList = document.querySelectorAll(".card_list")
 
 document.addEventListener("dragstart", (e) => {
     const card = e.target.closest(".card__item");
-
     if (card) card.classList.add("dragging");
-
-    
-    
 });
+
 document.addEventListener("dragend", (e) => {
     const card = e.target.closest(".card__item");
+    if (!card) return;
 
-    if (card) card.classList.remove("dragging");
-});
+    card.classList.remove("dragging");
+    salvarOrdem(card.closest(".card_list"));
+})
+
+
+async function salvarOrdem(list) {
+    const cards = [...list.querySelectorAll('.card__item')];
+
+    const ordem = cards.map((card, index) => ({
+        id: card.dataset.cardId,
+        position: index
+    }))
+
+    console.log(ordem)
+
+    await fetch(window.location.href, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            action: 'move_card',
+            list_card_id: list.dataset.listId,
+            card_id: ordem
+        })
+    })
+        .then(async (response) => {
+            const data = await response.json();
+            if (!response) throw new Error(data.error);
+        })
+
+        .catch((error) => alert(error.message))
+    
+
+}
 
 cardList.forEach((card__item) => {
     card__item.addEventListener("dragover", (e) => {
