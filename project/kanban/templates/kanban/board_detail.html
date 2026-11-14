@@ -22,17 +22,16 @@
                 Cancelar
             </button>
 
-            <a href="{% url 'kanban:criacao_de_card' board.pk %}" class="btn-create-card">Criar Card</a>
+            <a href="{% url 'kanban:criacao_de_card' board.id %}" class="btn-create-card">Criar Card</a>
         </div>
         <div class="board_list">
             {% for lista in listas%}
                 <section class="list__item" data-id="{{ lista.pk }}">
                     <h2 class="list__title">{{lista.title}}</h2>
-                    <div>
+                    <div class="card_list">
                         {% for card in lista.cards.all %}
-                        <article class="card__item">
+                        <article class="card__item" draggable="true">
                             <h3>{{ card.title }}</h3>
-                            <p>{{ card.description }}</p>
                         </article>
                         {% endfor %}
                     </div>

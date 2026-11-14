@@ -147,3 +147,48 @@ lists.forEach(list => {
         }
     });
 });
+
+const cardList = document.querySelectorAll(".card_list")
+
+document.addEventListener("dragstart", (e) => {
+    const card = e.target.closest(".card__item");
+
+    if (card) card.classList.add("dragging");
+
+    
+    
+});
+document.addEventListener("dragend", (e) => {
+    const card = e.target.closest(".card__item");
+
+    if (card) card.classList.remove("dragging");
+});
+
+cardList.forEach((card__item) => {
+    card__item.addEventListener("dragover", (e) => {
+        e.preventDefault();
+
+        const dragging = document.querySelector(".dragging")
+        const applyAfter = getNewPosition(card__item, e.clientY)
+
+        if (applyAfter) {
+            applyAfter.insertAdjacentElement("afterend", dragging);
+        } else {
+            card__item.prepend(dragging)
+        }
+    })
+})
+
+function getNewPosition(cardList, posY) {
+    const cards = cardList.querySelectorAll(".card__item:not(.dragging)");
+    let result;
+
+    for (let refer_card of cards) {
+        const box = refer_card .getBoundingClientRect();
+        const boxCenterY = box.y + box.height / 2;
+
+        if (posY >=boxCenterY) result = refer_card;
+    }
+
+    return result
+}
