@@ -77,7 +77,8 @@ def create_list_view(request, board_id):
         if form.is_valid():
             lista = form.save(commit=False)
             lista.board = board
-            lista.position = board.lists.count()
+            ultima_list =  board.lists.aggregate(Max('position', default=-1))['position__max']
+            lista.position = ultima_list + 1
             lista.save()
             return redirect('kanban:board_detail', board_id=board.id)
 
@@ -87,21 +88,21 @@ def create_list_view(request, board_id):
     return render(request, 'kanban/creation_list.html', {'form': form})          
 
 
-def edit_list_view(request, dados, list_id, board):
+def edit_list_view(request, dados, board):
+    lista = board.lists.filter(pk=dados.get('list_id')).first()
     title = dados.get('new_title')
     if title is None:
         return JsonResponse({'error': 'Título vazio, escreva novamente'}, status=400)
     if not title or len(title) > 100:
         return JsonResponse({'error': 'O Título tem que ser menor que 100 caractere e maior que 1 caractere'}, status=400)
 
-    lista = get_object_or_404(ListInfo, pk=list_id, board__members=request.user)
     new_title = dados.get('new_title')
     lista.title = new_title.strip()
     lista.save(update_fields=['title'])
     return JsonResponse({'message': 'Lista atualizada com sucesso', 'title': lista.title}, status=200)
 
 
-def delete_list_view(request, dados, list_id, board):
+def delete_list_view(request, dados,  board):
     lista = board.lists.filter(pk=dados.get('list_id')).first()
 
     if lista is None:
@@ -110,12 +111,12 @@ def delete_list_view(request, dados, list_id, board):
     lista.delete()
     return JsonResponse({'message': 'Etapa removida com sucesso'})
 
-def move_card(request, board, dados):
-    lista = board.lists.filter(pk=dados.get('list_id')).first()
+def move_card(request, dados, board):
+    lista = board.lists.filter(pk=dados.get('list_card_id')).first()
     
 
     if lista is None:
-        return JsonResponse({'erro': 'Suas etapas não foram encontradas'})
+        return JsonResponse({'erro': 'Suas etapas não foram encontradas'}, status=400)
 
     ids = []
 
@@ -149,7 +150,6 @@ def board_detail_view(request, board_id):
     if request.method == 'POST':
         try:
             dados = json.loads(request.body)
-            list_id = dados.get('list_id')
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Requisição inválida.'}, status=400)
         
@@ -158,7 +158,7 @@ def board_detail_view(request, board_id):
         if handler is None:
             return JsonResponse({'error': 'Requisição com dados inexistentes'}, status=400)
 
-        return handler(request, dados, list_id, board)
+        return handler(request, dados, board)
 
     listas = board.lists.order_by('position').prefetch_related('cards','cards__labels')
     return render(request, "kanban/board_detail.html", {'board': board, 'listas': listas} )
