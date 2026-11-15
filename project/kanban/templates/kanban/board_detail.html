@@ -28,9 +28,9 @@
             {% for lista in listas%}
                 <section class="list__item" data-id="{{ lista.pk }}">
                     <h2 class="list__title">{{lista.title}}</h2>
-                    <div class="card_list">
+                    <div class="card_list" data-list-id="{{ lista.pk }}">
                         {% for card in lista.cards.all %}
-                        <article class="card__item" draggable="true">
+                        <article class="card__item" draggable="true" data-card-id="{{ card.pk }}">
                             <h3>{{ card.title }}</h3>
                         </article>
                         {% endfor %}

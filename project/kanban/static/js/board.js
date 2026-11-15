@@ -188,7 +188,7 @@ async function salvarOrdem(list) {
     })
         .then(async (response) => {
             const data = await response.json();
-            if (!response) throw new Error(data.error);
+            if (!response.ok) throw new Error(data.error);
         })
 
         .catch((error) => alert(error.message))

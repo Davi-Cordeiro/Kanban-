@@ -112,16 +112,18 @@ def delete_list_view(request, dados,  board):
     return JsonResponse({'message': 'Etapa removida com sucesso'})
 
 def move_card(request, dados, board):
-    lista = board.lists.filter(pk=dados.get('list_card_id')).first()
+    print(dados)
+    lista = ListInfo.objects.filter(pk=dados.get('list_card_id')).first()
     
 
     if lista is None:
-        return JsonResponse({'erro': 'Suas etapas não foram encontradas'}, status=400)
+        print(lista)
+        return JsonResponse({'error': 'Suas etapas não foram encontradas'}, status=400)
 
     ids = []
 
     for i in dados.get('card_id') or []:
-        ids.append(int(i))
+        ids.append(int(i['id']))
 
     cards = CardInfo.objects.filter(list__board=board).in_bulk(ids)
 
